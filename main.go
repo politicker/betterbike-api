@@ -55,16 +55,17 @@ type CitibikeAPIResponse struct {
 }
 
 var connectionString string
-var database *sql.DB
+var queries *db.Queries
 
 func init() {
 	connectionString = os.Getenv("DATABASE_CONN_STRING")
 
-	var err error
-	database, err = sql.Open("postgres", connectionString)
+	database, err := sql.Open("postgres", connectionString)
 	if err != nil {
 		panic("failed to connect to database")
 	}
+
+	queries = db.New(database)
 }
 
 func poll() error {
@@ -92,7 +93,6 @@ func poll() error {
 
 	// unmarshal the response
 	json.NewDecoder(resp.Body).Decode(&result)
-	queries := db.New(database)
 
 	for i, station := range result.Data.Supply.Stations {
 		log.Printf("inserting station %d: %s", i, station.StationName)
@@ -140,6 +140,7 @@ func startPoller() {
 
 func main() {
 	startPoller()
+	ctx := context.Background()
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -147,7 +148,21 @@ func main() {
 	}
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Hello World!"))
+		stations, err := queries.GetStations(ctx, db.GetStationsParams{
+			Lat: 40.7259073,
+			Lon: -73.9841764,
+		})
+
+		if err != nil {
+			json.NewEncoder(w).Encode(map[string]string{
+				"error": err.Error(),
+			})
+
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(stations)
 	})
 
 	log.Println("listening on", port)

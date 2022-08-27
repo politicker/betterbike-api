@@ -10,6 +10,69 @@ import (
 	"encoding/json"
 )
 
+const getStations = `-- name: GetStations :many
+select
+	id,
+	name,
+	lat,
+	lon,
+	ebikes_available,
+	bike_docks_available,
+	ebikes,
+	ST_MakePoint(lat, lon) <-> ST_MakePoint( $1, $2 ) AS distance
+from stations
+order by distance asc
+limit 10
+`
+
+type GetStationsParams struct {
+	Lat interface{}
+	Lon interface{}
+}
+
+type GetStationsRow struct {
+	ID                 string
+	Name               string
+	Lat                float64
+	Lon                float64
+	EbikesAvailable    int32
+	BikeDocksAvailable int32
+	Ebikes             json.RawMessage
+	Distance           interface{}
+}
+
+func (q *Queries) GetStations(ctx context.Context, arg GetStationsParams) ([]GetStationsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getStations, arg.Lat, arg.Lon)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetStationsRow
+	for rows.Next() {
+		var i GetStationsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Lat,
+			&i.Lon,
+			&i.EbikesAvailable,
+			&i.BikeDocksAvailable,
+			&i.Ebikes,
+			&i.Distance,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const insertStation = `-- name: InsertStation :exec
 insert into
 	stations (
