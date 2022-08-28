@@ -40,7 +40,7 @@ func (p *Poller) Start() {
 	for {
 		err := p.poll()
 		if err != nil {
-			p.logger.Error(fmt.Sprintf("error polling citibike api: %s", err))
+			p.logger.Error(fmt.Sprintf("poller: %s", err))
 		}
 
 		<-time.After(1 * time.Minute)
