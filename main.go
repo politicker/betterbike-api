@@ -151,28 +151,25 @@ func main() {
 	}
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		// var stationParams db.GetStationsParams
-		// err := json.NewDecoder(r.Body).Decode(&stationParams)
+		var stationParams db.GetStationsParams
+		err := json.NewDecoder(r.Body).Decode(&stationParams)
+		if err != nil {
+			json.NewEncoder(w).Encode(map[string]string{
+				"error": err.Error(),
+			})
+		}
 
-		// id := r.URL.Query().Get("id")
-
-		// get params from query string
 		w.Header().Set("Content-Type", "application/json")
 
-		// if err != nil {
-		// 	json.NewEncoder(w).Encode(map[string]string{
-		// 		"error": err.Error(),
-		// 	})
+		if stationParams.Lat == 0 || stationParams.Lon == 0 {
+			json.NewEncoder(w).Encode(map[string]string{
+				"error": "lat and lon are required",
+			})
 
-		// 	return
-		// }
+			return
+		}
 
-		stations, err := queries.GetStations(ctx, db.GetStationsParams{
-			Lat: 40.7203835,
-			Lon: -73.9548707,
-		})
-
-		// stations, err := queries.GetStations(ctx, stationParams)
+		stations, err := queries.GetStations(ctx, stationParams)
 		if err != nil {
 			json.NewEncoder(w).Encode(map[string]string{
 				"error": err.Error(),
