@@ -8,6 +8,7 @@ package db
 import (
 	"context"
 	"encoding/json"
+	"time"
 )
 
 const getStations = `-- name: GetStations :many
@@ -19,8 +20,10 @@ select
 	ebikes_available,
 	bike_docks_available,
 	ebikes,
-	ST_MakePoint(lat, lon) <-> ST_MakePoint( $1, $2 ) AS distance
+	ST_MakePoint(lat, lon) <-> ST_MakePoint( $1, $2 ) AS distance,
+	created_at
 from stations
+where ebikes_available > 0
 order by distance asc
 limit 10
 `
@@ -39,6 +42,7 @@ type GetStationsRow struct {
 	BikeDocksAvailable int32
 	Ebikes             json.RawMessage
 	Distance           interface{}
+	CreatedAt          time.Time
 }
 
 func (q *Queries) GetStations(ctx context.Context, arg GetStationsParams) ([]GetStationsRow, error) {
@@ -59,6 +63,7 @@ func (q *Queries) GetStations(ctx context.Context, arg GetStationsParams) ([]Get
 			&i.BikeDocksAvailable,
 			&i.Ebikes,
 			&i.Distance,
+			&i.CreatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -100,7 +105,8 @@ ON CONFLICT (id) DO UPDATE
 		lon = EXCLUDED.lon,
 		ebikes_available = EXCLUDED.ebikes_available,
 		bike_docks_available = EXCLUDED.bike_docks_available,
-		ebikes = EXCLUDED.ebikes
+		ebikes = EXCLUDED.ebikes,
+		created_at = now()
 `
 
 type InsertStationParams struct {

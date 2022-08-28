@@ -5,14 +5,26 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"time"
 
 	"github.com/apoliticker/citibike/db"
+	"github.com/apoliticker/citibike/view"
 	_ "github.com/lib/pq"
 )
+
+type CitibikeEbike struct {
+	BatteryStatus struct {
+		DistanceRemaining struct {
+			Value int    `json:"value"`
+			Unit  string `json:"unit"`
+		} `json:"distanceRemaining"`
+		Percent int `json:"percent"`
+	} `json:"batteryStatus"`
+}
 
 type CitibikeAPIResponse struct {
 	Data struct {
@@ -24,28 +36,20 @@ type CitibikeAPIResponse struct {
 					Lat float64 `json:"lat"`
 					Lng float64 `json:"lng"`
 				} `json:"location"`
-				BikesAvailable          int      `json:"bikesAvailable"`
-				BikeDocksAvailable      int      `json:"bikeDocksAvailable"`
-				EbikesAvailable         int      `json:"ebikesAvailable"`
-				ScootersAvailable       int      `json:"scootersAvailable"`
-				TotalBikesAvailable     int      `json:"totalBikesAvailable"`
-				TotalRideablesAvailable int      `json:"totalRideablesAvailable"`
-				IsValet                 bool     `json:"isValet"`
-				IsOffline               bool     `json:"isOffline"`
-				IsLightweight           bool     `json:"isLightweight"`
-				DisplayMessages         []string `json:"displayMessages"`
-				SiteId                  string   `json:"siteId"`
-				Ebikes                  []struct {
-					BatteryStatus struct {
-						DistanceRemaining struct {
-							Value int    `json:"value"`
-							Unit  string `json:"unit"`
-						} `json:"distanceRemaining"`
-						Percent int `json:"percent"`
-					} `json:"batteryStatus"`
-				} `json:"ebikes"`
-				Scooters      []interface{} `json:"scooters"`
-				LastUpdatedMs int64         `json:"lastUpdatedMs"`
+				BikesAvailable          int             `json:"bikesAvailable"`
+				BikeDocksAvailable      int             `json:"bikeDocksAvailable"`
+				EbikesAvailable         int             `json:"ebikesAvailable"`
+				ScootersAvailable       int             `json:"scootersAvailable"`
+				TotalBikesAvailable     int             `json:"totalBikesAvailable"`
+				TotalRideablesAvailable int             `json:"totalRideablesAvailable"`
+				IsValet                 bool            `json:"isValet"`
+				IsOffline               bool            `json:"isOffline"`
+				IsLightweight           bool            `json:"isLightweight"`
+				DisplayMessages         []string        `json:"displayMessages"`
+				SiteId                  string          `json:"siteId"`
+				Ebikes                  []CitibikeEbike `json:"ebikes"`
+				Scooters                []interface{}   `json:"scooters"`
+				LastUpdatedMs           int64           `json:"lastUpdatedMs"`
 			} `json:"stations"`
 			Rideables     []interface{} `json:"rideables"`
 			Notices       []interface{} `json:"notices"`
@@ -132,7 +136,6 @@ func startPoller() {
 				log.Println(err)
 			}
 
-			// wait 1 minute
 			<-time.After(1 * time.Minute)
 		}
 	}()
@@ -148,11 +151,28 @@ func main() {
 	}
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		// var stationParams db.GetStationsParams
+		// err := json.NewDecoder(r.Body).Decode(&stationParams)
+
+		// id := r.URL.Query().Get("id")
+
+		// get params from query string
+		w.Header().Set("Content-Type", "application/json")
+
+		// if err != nil {
+		// 	json.NewEncoder(w).Encode(map[string]string{
+		// 		"error": err.Error(),
+		// 	})
+
+		// 	return
+		// }
+
 		stations, err := queries.GetStations(ctx, db.GetStationsParams{
 			Lat: 40.7259073,
 			Lon: -73.9841764,
 		})
 
+		// stations, err := queries.GetStations(ctx, stationParams)
 		if err != nil {
 			json.NewEncoder(w).Encode(map[string]string{
 				"error": err.Error(),
@@ -161,8 +181,43 @@ func main() {
 			return
 		}
 
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(stations)
+		var viewStations []view.Station
+
+		for _, station := range stations {
+			var bikes []view.Bike
+			var ebikes []CitibikeEbike
+
+			err = json.Unmarshal(station.Ebikes, &ebikes)
+
+			if err != nil {
+				json.NewEncoder(w).Encode(map[string]string{
+					"error": err.Error(),
+				})
+
+				return
+			}
+
+			for _, bike := range ebikes {
+				quarter := int((float64(bike.BatteryStatus.Percent)/100)*4) * 25
+
+				bikes = append(bikes, view.Bike{
+					BatteryIcon: fmt.Sprintf("battery.%d", quarter),
+					Range:       fmt.Sprintf("%d %s", bike.BatteryStatus.DistanceRemaining.Value, bike.BatteryStatus.DistanceRemaining.Unit),
+				})
+			}
+
+			viewStations = append(viewStations, view.Station{
+				ID:        station.ID,
+				Name:      station.Name,
+				BikeCount: fmt.Sprint(station.EbikesAvailable),
+				Bikes:     bikes,
+			})
+		}
+
+		json.NewEncoder(w).Encode(view.Home{
+			LastUpdated: stations[0].CreatedAt,
+			Stations:    viewStations,
+		})
 	})
 
 	log.Println("listening on", port)
