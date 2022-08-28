@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"os"
 	"time"
 
@@ -14,6 +15,7 @@ var queries *db.Queries
 
 func init() {
 	databaseURL = os.Getenv("DATABASE_URL")
+	fmt.Println("connecting to: ", databaseURL)
 
 	database, err := sql.Open("postgres", databaseURL)
 	if err != nil {
@@ -30,7 +32,6 @@ func main() {
 	}
 
 	// TODO: Pass cancellable context to poller and server
-	// TODO: Pass logger to poller and server
 
 	poller := NewPoller(queries, 1*time.Minute)
 	go poller.Start()
