@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"log"
+	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/apoliticker/citibike/citibike"
 	"github.com/apoliticker/citibike/db"
+	"github.com/apoliticker/citibike/logger"
 )
 
 const (
@@ -18,12 +19,20 @@ const (
 )
 
 type Poller struct {
-	queries *db.Queries
+	queries      *db.Queries
+	pollDuration time.Duration
+	logger       logger.LogWriter
 }
 
-func NewPoller(queries *db.Queries) Poller {
+func NewPoller(queries *db.Queries, pollDuration time.Duration) Poller {
+	if pollDuration < 1*time.Minute {
+		pollDuration = 1 * time.Minute
+	}
+
 	return Poller{
-		queries: queries,
+		logger:       logger.New("poller"),
+		queries:      queries,
+		pollDuration: pollDuration,
 	}
 }
 
@@ -31,8 +40,7 @@ func (p *Poller) Start() {
 	for {
 		err := p.poll()
 		if err != nil {
-			log.Println("an error!")
-			log.Println(err)
+			p.logger.Error(fmt.Sprintf("error polling citibike api: %s", err))
 		}
 
 		<-time.After(1 * time.Minute)
@@ -40,7 +48,7 @@ func (p *Poller) Start() {
 }
 
 func (p *Poller) poll() error {
-	log.Println("requesting citibike api")
+	p.logger.Info("polling citibike api")
 
 	data, err := p.fetchStationData()
 	if err != nil {
@@ -56,12 +64,12 @@ func (p *Poller) poll() error {
 }
 
 func (p *Poller) insertStationData(response *citibike.APIResponse) error {
-	for i, station := range response.Data.Supply.Stations {
-		log.Printf("inserting station %d: %s", i, station.StationName)
+	p.logger.Info("inserting station data")
 
+	for _, station := range response.Data.Supply.Stations {
 		ebikesJson, err := json.Marshal(station.Ebikes)
 		if err != nil {
-			log.Printf("error marshalling ebikes: %s", err)
+			p.logger.Error(fmt.Sprintf("error marshalling ebikes: %s", err))
 			return err
 		}
 
@@ -75,13 +83,12 @@ func (p *Poller) insertStationData(response *citibike.APIResponse) error {
 			Ebikes:             ebikesJson,
 		})
 		if err != nil {
-			log.Fatalf("error inserting station: %s", err)
+			p.logger.Error(fmt.Sprintf("error inserting station: %s", err))
 			return err
 		}
-
-		log.Printf("inserted station %d: %s", i, station.StationName)
 	}
 
+	p.logger.Info("inserted station data")
 	return nil
 }
 

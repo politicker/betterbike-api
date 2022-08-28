@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"os"
+	"time"
 
 	"github.com/apoliticker/citibike/db"
 	_ "github.com/lib/pq"
@@ -31,8 +32,7 @@ func main() {
 	// TODO: Pass cancellable context to poller and server
 	// TODO: Pass logger to poller and server
 
-	// TODO: Pass poll duration to poller
-	poller := NewPoller(queries)
+	poller := NewPoller(queries, 1*time.Minute)
 	go poller.Start()
 
 	srv := NewServer(port, queries)

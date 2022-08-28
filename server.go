@@ -4,21 +4,23 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/apoliticker/citibike/api"
 	"github.com/apoliticker/citibike/citibike"
 	"github.com/apoliticker/citibike/db"
+	"github.com/apoliticker/citibike/logger"
 )
 
 type Server struct {
+	logger  logger.LogWriter
 	queries *db.Queries
 	port    string
 }
 
 func NewServer(port string, queries *db.Queries) Server {
 	return Server{
+		logger:  logger.New("server"),
 		queries: queries,
 		port:    port,
 	}
@@ -26,8 +28,9 @@ func NewServer(port string, queries *db.Queries) Server {
 
 func (s *Server) Start() {
 	http.HandleFunc("/", s.GetBikes)
-	log.Println("listening on", s.port)
-	log.Fatal(http.ListenAndServe(":"+s.port, nil))
+
+	s.logger.Info(fmt.Sprintf("listening on: %s", s.port))
+	http.ListenAndServe(":"+s.port, nil)
 }
 
 func (s *Server) GetBikes(w http.ResponseWriter, r *http.Request) {
