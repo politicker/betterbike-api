@@ -33,34 +33,35 @@ func (s *Server) Start() {
 	http.ListenAndServe(":"+s.port, nil)
 }
 
+func (s *Server) renderError(w http.ResponseWriter, message string) {
+	w.WriteHeader(http.StatusUnprocessableEntity)
+	s.logger.Error(fmt.Sprintf("client error: message=%s", message))
+
+	json.NewEncoder(w).Encode(map[string]string{
+		"error": message,
+	})
+}
+
 func (s *Server) GetBikes(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
+
+	w.Header().Set("Content-Type", "application/json")
 
 	var stationParams db.GetStationsParams
 	err := json.NewDecoder(r.Body).Decode(&stationParams)
 	if err != nil {
-		json.NewEncoder(w).Encode(map[string]string{
-			"error": "lat and lon are required",
-		})
+		s.renderError(w, "lat and lon are required")
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-
 	if stationParams.Lat == 0 || stationParams.Lon == 0 {
-		json.NewEncoder(w).Encode(map[string]string{
-			"error": fmt.Sprintf("invalid lat or lon: %f, %f", stationParams.Lat, stationParams.Lon),
-		})
-
+		s.renderError(w, fmt.Sprintf("invalid lat or lon: %f, %f", stationParams.Lat, stationParams.Lon))
 		return
 	}
 
 	stations, err := s.queries.GetStations(ctx, stationParams)
 	if err != nil {
-		json.NewEncoder(w).Encode(map[string]string{
-			"error": err.Error(),
-		})
-
+		s.renderError(w, err.Error())
 		return
 	}
 
@@ -73,10 +74,7 @@ func (s *Server) GetBikes(w http.ResponseWriter, r *http.Request) {
 		err = json.Unmarshal(station.Ebikes, &ebikes)
 
 		if err != nil {
-			json.NewEncoder(w).Encode(map[string]string{
-				"error": err.Error(),
-			})
-
+			s.renderError(w, err.Error())
 			return
 		}
 
