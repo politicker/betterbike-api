@@ -1,5 +1,9 @@
 set dotenv-load
 
+setup:
+	brew bundle && \
+	createdb citibike-dev
+
 gen:
 	sqlc generate
 
