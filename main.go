@@ -9,13 +9,13 @@ import (
 	_ "github.com/lib/pq"
 )
 
-var connectionString string
+var databaseURL string
 var queries *db.Queries
 
 func init() {
-	connectionString = os.Getenv("DATABASE_CONN_STRING")
+	databaseURL = os.Getenv("DATABASE_URL")
 
-	database, err := sql.Open("postgres", connectionString)
+	database, err := sql.Open("postgres", databaseURL)
 	if err != nil {
 		panic("failed to connect to database")
 	}
