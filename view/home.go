@@ -3,6 +3,7 @@ package view
 import "time"
 
 type Bike struct {
+	ID          string `json:"id"`
 	Range       string `json:"range"`
 	BatteryIcon string `json:"batteryIcon"`
 }

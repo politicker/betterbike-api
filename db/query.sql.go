@@ -20,7 +20,7 @@ select
 	ebikes_available,
 	bike_docks_available,
 	ebikes,
-	ST_MakePoint(lat, lon) <-> ST_MakePoint( $1, $2 ) AS distance,
+	ST_MakePoint(lon, lat) <-> ST_MakePoint( $1, $2 ) AS distance,
 	created_at
 from stations
 where ebikes_available > 0
@@ -29,8 +29,8 @@ limit 10
 `
 
 type GetStationsParams struct {
-	Lat interface{}
 	Lon interface{}
+	Lat interface{}
 }
 
 type GetStationsRow struct {
@@ -46,7 +46,7 @@ type GetStationsRow struct {
 }
 
 func (q *Queries) GetStations(ctx context.Context, arg GetStationsParams) ([]GetStationsRow, error) {
-	rows, err := q.db.QueryContext(ctx, getStations, arg.Lat, arg.Lon)
+	rows, err := q.db.QueryContext(ctx, getStations, arg.Lon, arg.Lat)
 	if err != nil {
 		return nil, err
 	}

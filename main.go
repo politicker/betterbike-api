@@ -168,8 +168,8 @@ func main() {
 		// }
 
 		stations, err := queries.GetStations(ctx, db.GetStationsParams{
-			Lat: 40.7259073,
-			Lon: -73.9841764,
+			Lat: 40.7203835,
+			Lon: -73.9548707,
 		})
 
 		// stations, err := queries.GetStations(ctx, stationParams)
@@ -197,10 +197,11 @@ func main() {
 				return
 			}
 
-			for _, bike := range ebikes {
+			for idx, bike := range ebikes {
 				quarter := int((float64(bike.BatteryStatus.Percent)/100)*4) * 25
 
 				bikes = append(bikes, view.Bike{
+					ID:          fmt.Sprintf("%s-%d", station.ID, idx),
 					BatteryIcon: fmt.Sprintf("battery.%d", quarter),
 					Range:       fmt.Sprintf("%d %s", bike.BatteryStatus.DistanceRemaining.Value, bike.BatteryStatus.DistanceRemaining.Unit),
 				})
