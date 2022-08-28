@@ -38,7 +38,7 @@ select
 	ebikes_available,
 	bike_docks_available,
 	ebikes,
-	ST_MakePoint(lon, lat) <-> ST_MakePoint( sqlc.arg(lon), sqlc.arg(lat) ) AS distance,
+	ST_MakePoint(lon, lat) <-> ST_MakePoint( sqlc.arg(lon)::float, sqlc.arg(lat)::float ) AS distance,
 	created_at
 from stations
 where ebikes_available > 0

@@ -20,7 +20,7 @@ select
 	ebikes_available,
 	bike_docks_available,
 	ebikes,
-	ST_MakePoint(lon, lat) <-> ST_MakePoint( $1, $2 ) AS distance,
+	ST_MakePoint(lon, lat) <-> ST_MakePoint( $1::float, $2::float ) AS distance,
 	created_at
 from stations
 where ebikes_available > 0
@@ -29,8 +29,8 @@ limit 10
 `
 
 type GetStationsParams struct {
-	Lon interface{}
-	Lat interface{}
+	Lon float64
+	Lat float64
 }
 
 type GetStationsRow struct {
