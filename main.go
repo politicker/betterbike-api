@@ -17,7 +17,9 @@ func init() {
 	databaseURL = os.Getenv("DATABASE_URL")
 	fmt.Println("connecting to: ", databaseURL)
 
-	databaseURL = fmt.Sprintf("%s?sslmode=disable", databaseURL)
+	if os.Getenv("GO_ENV") == "production" {
+		databaseURL = fmt.Sprintf("%s?sslmode=disable", databaseURL)
+	}
 
 	database, err := sql.Open("postgres", databaseURL)
 	if err != nil {
