@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/apoliticker/citibike/api"
 	"github.com/apoliticker/citibike/citibike"
@@ -35,7 +36,7 @@ func (s *Server) Start() {
 
 func (s *Server) renderError(w http.ResponseWriter, message string) {
 	w.WriteHeader(http.StatusUnprocessableEntity)
-	s.logger.Error(fmt.Sprintf("client error: message=%s", message))
+	s.logger.Error(message)
 
 	json.NewEncoder(w).Encode(map[string]string{
 		"error": message,
@@ -44,6 +45,7 @@ func (s *Server) renderError(w http.ResponseWriter, message string) {
 
 func (s *Server) GetBikes(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
+	start := time.Now()
 
 	w.Header().Set("Content-Type", "application/json")
 
@@ -100,4 +102,6 @@ func (s *Server) GetBikes(w http.ResponseWriter, r *http.Request) {
 		LastUpdated: stations[0].CreatedAt,
 		Stations:    viewStations,
 	})
+
+	s.logger.Info(fmt.Sprintf("method=%s path=%s duration=%s", r.Method, r.URL.Path, time.Since(start)))
 }
