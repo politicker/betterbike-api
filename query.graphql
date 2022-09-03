@@ -1,0 +1,27 @@
+query GetSystemSupply {
+  supply {
+    stations {
+      stationId
+      stationName
+      location {
+        lat
+        lng
+      }
+      bikesAvailable
+      bikeDocksAvailable
+      ebikesAvailable
+      totalBikesAvailable
+      isOffline
+      ebikes {
+        batteryStatus {
+          distanceRemaining {
+            value
+            unit
+          }
+          percent
+        }
+      }
+      lastUpdatedMs
+    }
+  }
+}
