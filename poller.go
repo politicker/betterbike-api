@@ -48,8 +48,6 @@ func (p *Poller) Start() {
 }
 
 func (p *Poller) poll() error {
-	p.logger.Info("polling citibike api")
-
 	data, err := p.fetchStationData()
 	if err != nil {
 		return err
@@ -64,7 +62,7 @@ func (p *Poller) poll() error {
 }
 
 func (p *Poller) insertStationData(response *citibike.APIResponse) error {
-	p.logger.Info("inserting station data")
+	p.logger.Info("inserting station data for %d stations", len(response.Data.Supply.Stations))
 
 	for _, station := range response.Data.Supply.Stations {
 		ebikesJson, err := json.Marshal(station.Ebikes)
@@ -100,14 +98,21 @@ func (p *Poller) fetchStationData() (*citibike.APIResponse, error) {
 		return nil, err
 	}
 
+	p.logger.Info("fetching station data")
 	reader := bytes.NewReader(jsonPayload)
 	resp, err := http.Post(baseURL, "application/json", reader)
 	if err != nil {
+		p.logger.Error("error fetching station data %v", err)
 		return nil, err
 	}
 
 	result := citibike.APIResponse{}
-	json.NewDecoder(resp.Body).Decode(&result)
+	err = json.NewDecoder(resp.Body).Decode(&result)
+	if err != nil {
+		p.logger.Error("error decoding station data %v", err)
+		return nil, err
+	}
 
+	p.logger.Info("fetched station data")
 	return &result, nil
 }
