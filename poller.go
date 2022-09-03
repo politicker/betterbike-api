@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"context"
+	_ "embed"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -13,9 +14,11 @@ import (
 	"github.com/apoliticker/citibike/logger"
 )
 
+//go:embed query.graphql
+var citibikeAPIQuery string
+
 const (
-	baseURL          = "https://account.citibikenyc.com/bikesharefe-gql"
-	citibikeAPIQuery = "query GetSystemSupply { supply { stations { stationId stationName location { lat lng __typename } bikesAvailable bikeDocksAvailable ebikesAvailable scootersAvailable totalBikesAvailable totalRideablesAvailable isValet isOffline isLightweight displayMessages siteId ebikes { batteryStatus { distanceRemaining { value unit __typename } percent __typename } __typename } scooters { batteryStatus { distanceRemaining { value unit __typename } percent __typename } __typename } lastUpdatedMs __typename } rideables { location { lat lng __typename } rideableType batteryStatus { distanceRemaining { value unit __typename } percent __typename } __typename } notices { localizedTitle localizedDescription url __typename } requestErrors { localizedTitle localizedDescription url __typename } __typename }}"
+	baseURL = "https://account.citibikenyc.com/bikesharefe-gql"
 )
 
 type Poller struct {
@@ -104,6 +107,10 @@ func (p *Poller) fetchStationData() (*citibike.APIResponse, error) {
 	resp, err := http.Post(baseURL, "application/json", reader)
 	if err != nil {
 		return nil, err
+	}
+
+	if resp.StatusCode != 200 {
+		return nil, fmt.Errorf("citibike api returned status code %d", resp.StatusCode)
 	}
 
 	result := citibike.APIResponse{}
