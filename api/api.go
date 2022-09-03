@@ -9,10 +9,12 @@ type Bike struct {
 }
 
 type Station struct {
-	ID        string `json:"id"`
-	Name      string `json:"name"`
-	BikeCount string `json:"bikeCount"`
-	Bikes     []Bike `json:"bikes"`
+	ID        string  `json:"id"`
+	Name      string  `json:"name"`
+	BikeCount string  `json:"bikeCount"`
+	Bikes     []Bike  `json:"bikes"`
+	Lat       float64 `json:"lat"`
+	Lon       float64 `json:"lon"`
 }
 
 type Home struct {

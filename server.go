@@ -95,6 +95,8 @@ func (s *Server) GetBikes(w http.ResponseWriter, r *http.Request) {
 			Name:      station.Name,
 			BikeCount: fmt.Sprint(station.EbikesAvailable),
 			Bikes:     bikes,
+			Lat:       station.Lat,
+			Lon:       station.Lon,
 		})
 	}
 
