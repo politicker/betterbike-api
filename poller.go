@@ -65,7 +65,7 @@ func (p *Poller) poll() error {
 }
 
 func (p *Poller) insertStationData(response *citibike.APIResponse) error {
-	p.logger.Info("inserting station data for %d stations", len(response.Data.Supply.Stations))
+	p.logger.Info(fmt.Sprintf("inserting station data for %d stations", len(response.Data.Supply.Stations)))
 
 	for _, station := range response.Data.Supply.Stations {
 		ebikesJson, err := json.Marshal(station.Ebikes)
