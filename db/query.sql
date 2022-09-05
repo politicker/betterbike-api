@@ -8,7 +8,8 @@ insert into
 		lon,
 		ebikes_available,
 		bike_docks_available,
-		ebikes
+		ebikes,
+		created_at
 	)
 values (
 	$1,
@@ -17,7 +18,8 @@ values (
 	$4,
 	$5,
 	$6,
-	$7
+	$7,
+	now() at time zone 'utc'
 )
 ON CONFLICT (id) DO UPDATE
 	SET
@@ -27,7 +29,7 @@ ON CONFLICT (id) DO UPDATE
 		ebikes_available = EXCLUDED.ebikes_available,
 		bike_docks_available = EXCLUDED.bike_docks_available,
 		ebikes = EXCLUDED.ebikes,
-		created_at = now();
+		created_at = now() at time zone 'utc';
 
 -- name: GetStations :many
 select
