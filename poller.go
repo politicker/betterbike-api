@@ -6,12 +6,12 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
+	"go.uber.org/zap"
 	"net/http"
 	"time"
 
 	"github.com/apoliticker/citibike/citibike"
 	"github.com/apoliticker/citibike/db"
-	"github.com/apoliticker/citibike/logger"
 )
 
 //go:embed query.graphql
@@ -24,16 +24,16 @@ const (
 type Poller struct {
 	queries      *db.Queries
 	pollDuration time.Duration
-	logger       logger.LogWriter
+	logger       *zap.Logger
 }
 
-func NewPoller(queries *db.Queries, pollDuration time.Duration) Poller {
+func NewPoller(queries *db.Queries, logger *zap.Logger, pollDuration time.Duration) Poller {
 	if pollDuration < 1*time.Minute {
 		pollDuration = 1 * time.Minute
 	}
 
 	return Poller{
-		logger:       logger.New("poller"),
+		logger:       logger,
 		queries:      queries,
 		pollDuration: pollDuration,
 	}
@@ -43,7 +43,7 @@ func (p *Poller) Start() {
 	for {
 		err := p.poll()
 		if err != nil {
-			p.logger.Error(fmt.Sprintf("poller: %s", err))
+			p.logger.Error("poller error", zap.Error(err))
 		}
 
 		<-time.After(1 * time.Minute)
@@ -65,12 +65,15 @@ func (p *Poller) poll() error {
 }
 
 func (p *Poller) insertStationData(response *citibike.APIResponse) error {
-	p.logger.Info(fmt.Sprintf("inserting station data for %d stations", len(response.Data.Supply.Stations)))
+	p.logger.Info(
+		fmt.Sprintf("inserting station data for %d stations", len(response.Data.Supply.Stations)),
+		zap.Int("stationCount", len(response.Data.Supply.Stations)),
+	)
 
 	for _, station := range response.Data.Supply.Stations {
 		ebikesJson, err := json.Marshal(station.Ebikes)
 		if err != nil {
-			p.logger.Error(fmt.Sprintf("error marshalling ebikes: %s", err))
+			p.logger.Error("error marshalling ebikes", zap.Error(err))
 			return err
 		}
 
@@ -84,7 +87,7 @@ func (p *Poller) insertStationData(response *citibike.APIResponse) error {
 			Ebikes:             ebikesJson,
 		})
 		if err != nil {
-			p.logger.Error(fmt.Sprintf("error inserting station: %s", err))
+			p.logger.Error("error inserting station", zap.Error(err))
 			return err
 		}
 	}
@@ -105,18 +108,20 @@ func (p *Poller) fetchStationData() (*citibike.APIResponse, error) {
 	reader := bytes.NewReader(jsonPayload)
 	resp, err := http.Post(baseURL, "application/json", reader)
 	if err != nil {
-		p.logger.Error("error fetching station data %v", err)
+		p.logger.Error("error fetching station data", zap.Error(err))
 		return nil, err
 	}
 
 	if resp.StatusCode != 200 {
-		return nil, fmt.Errorf("citibike api returned status code %d", resp.StatusCode)
+		err = fmt.Errorf("citibike api returned status code %d", resp.StatusCode)
+		p.logger.Error("citibike api error", zap.Error(err), zap.Int("statusCode", resp.StatusCode))
+		return nil, err
 	}
 
 	result := citibike.APIResponse{}
 	err = json.NewDecoder(resp.Body).Decode(&result)
 	if err != nil {
-		p.logger.Error("error decoding station data %v", err)
+		p.logger.Error("error decoding station data", zap.Error(err))
 		return nil, err
 	}
 

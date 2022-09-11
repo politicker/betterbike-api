@@ -4,33 +4,33 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"go.uber.org/zap"
 	"net/http"
 	"time"
 
 	"github.com/apoliticker/citibike/api"
 	"github.com/apoliticker/citibike/citibike"
 	"github.com/apoliticker/citibike/db"
-	"github.com/apoliticker/citibike/logger"
 )
 
 type Server struct {
-	logger  logger.LogWriter
+	logger  *zap.Logger
 	queries *db.Queries
 	port    string
 }
 
-func NewServer(port string, queries *db.Queries) Server {
+func NewServer(port string, queries *db.Queries, logger *zap.Logger) Server {
 	return Server{
-		logger:  logger.New("server"),
 		queries: queries,
 		port:    port,
+		logger:  logger,
 	}
 }
 
 func (s *Server) Start() {
 	http.HandleFunc("/", s.GetBikes)
 
-	s.logger.Info(fmt.Sprintf("listening on: %s", s.port))
+	s.logger.Info("listening", zap.String("port", s.port))
 	http.ListenAndServe(":"+s.port, nil)
 }
 
@@ -105,5 +105,10 @@ func (s *Server) GetBikes(w http.ResponseWriter, r *http.Request) {
 		Stations:    viewStations,
 	})
 
-	s.logger.Info(fmt.Sprintf("method=%s path=%s duration=%s", r.Method, r.URL.Path, time.Since(start)))
+	s.logger.Info(
+		fmt.Sprintf("%s %s %s", r.Method, r.URL.Path, time.Since(start)),
+		zap.String("method", r.Method),
+		zap.String("path", r.URL.Path),
+		zap.Duration("duration", time.Since(start)),
+	)
 }
