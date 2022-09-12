@@ -52,10 +52,10 @@ func main() {
 	}
 
 	// TODO: Pass cancellable context to poller and server
-	poller := NewPoller(queries, logger, 1*time.Minute)
+	poller := NewPoller(queries, logger.With(zap.String("context", "poller")), 1*time.Minute)
 	go poller.Start()
 
-	srv := NewServer(port, queries, logger)
+	srv := NewServer(port, queries, logger.With(zap.String("context", "server")))
 	srv.Start()
 
 	logger.Sync()
