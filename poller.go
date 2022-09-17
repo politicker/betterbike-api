@@ -6,6 +6,7 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
+	"github.com/getsentry/sentry-go"
 	"go.uber.org/zap"
 	"net/http"
 	"time"
@@ -87,6 +88,7 @@ func (p *Poller) insertStationData(response *citibike.APIResponse) error {
 			Ebikes:             ebikesJson,
 		})
 		if err != nil {
+			sentry.CaptureException(err)
 			p.logger.Error("error inserting station", zap.Error(err))
 			return err
 		}

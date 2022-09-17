@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/getsentry/sentry-go"
 	"go.uber.org/zap"
 	"net/http"
 	"time"
@@ -63,6 +64,7 @@ func (s *Server) GetBikes(w http.ResponseWriter, r *http.Request) {
 
 	stations, err := s.queries.GetStations(ctx, stationParams)
 	if err != nil {
+		sentry.CaptureException(err)
 		s.renderError(w, err.Error())
 		return
 	}

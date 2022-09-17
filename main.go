@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/apoliticker/citibike/db"
+	"github.com/getsentry/sentry-go"
 	_ "github.com/lib/pq"
 	_ "github.com/politicker/zap-sink-datadog"
 )
@@ -49,6 +50,18 @@ func main() {
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8081"
+	}
+
+	if os.Getenv("SENTRY_DSN") != "" {
+		err := sentry.Init(sentry.ClientOptions{
+			Dsn:              os.Getenv("SENTRY_DSN"),
+			TracesSampleRate: 1.0,
+			Environment:      os.Getenv("SENTRY_ENV"),
+			Release:          os.Getenv("RELEASE_NAME"),
+		})
+		if err != nil {
+			logger.Fatal("sentry.Init failed", zap.Error(err))
+		}
 	}
 
 	// TODO: Pass cancellable context to poller and server
