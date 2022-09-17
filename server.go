@@ -35,12 +35,13 @@ func (s *Server) Start() {
 	http.ListenAndServe(":"+s.port, nil)
 }
 
-func (s *Server) renderError(w http.ResponseWriter, message string) {
+func (s *Server) renderError(w http.ResponseWriter, message string, errorCode string) {
 	w.WriteHeader(http.StatusUnprocessableEntity)
 	s.logger.Error(message)
 
 	json.NewEncoder(w).Encode(map[string]string{
-		"error": message,
+		"error":     message,
+		"errorCode": errorCode,
 	})
 }
 
@@ -53,19 +54,19 @@ func (s *Server) GetBikes(w http.ResponseWriter, r *http.Request) {
 	var stationParams db.GetStationsParams
 	err := json.NewDecoder(r.Body).Decode(&stationParams)
 	if err != nil {
-		s.renderError(w, "lat and lon are required")
+		s.renderError(w, "lat and lon are required", "invalid-json-payload")
 		return
 	}
 
 	if stationParams.Lat == 0 || stationParams.Lon == 0 {
-		s.renderError(w, fmt.Sprintf("invalid lat or lon: %f, %f", stationParams.Lat, stationParams.Lon))
+		s.renderError(w, fmt.Sprintf("invalid lat or lon: %f, %f", stationParams.Lat, stationParams.Lon), "missing-coords")
 		return
 	}
 
 	stations, err := s.queries.GetStations(ctx, stationParams)
 	if err != nil {
 		sentry.CaptureException(err)
-		s.renderError(w, err.Error())
+		s.renderError(w, err.Error(), "get-stations-failed")
 		return
 	}
 
@@ -78,7 +79,7 @@ func (s *Server) GetBikes(w http.ResponseWriter, r *http.Request) {
 		err = json.Unmarshal(station.Ebikes, &ebikes)
 
 		if err != nil {
-			s.renderError(w, err.Error())
+			s.renderError(w, err.Error(), "invalid-json-ebikes")
 			return
 		}
 
@@ -99,7 +100,13 @@ func (s *Server) GetBikes(w http.ResponseWriter, r *http.Request) {
 			Bikes:     bikes,
 			Lat:       station.Lat,
 			Lon:       station.Lon,
+			Distance:  station.Distance,
 		})
+	}
+
+	if len(stations) == 0 {
+		s.renderError(w, "No ebikes nearby!", "too-far-away")
+		return
 	}
 
 	json.NewEncoder(w).Encode(api.Home{

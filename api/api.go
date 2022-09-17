@@ -15,6 +15,7 @@ type Station struct {
 	Bikes     []Bike  `json:"bikes"`
 	Lat       float64 `json:"lat"`
 	Lon       float64 `json:"lon"`
+	Distance  float64 `json:"distance"`
 }
 
 type Home struct {

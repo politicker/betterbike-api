@@ -40,9 +40,21 @@ select
 	ebikes_available,
 	bike_docks_available,
 	ebikes,
-	ST_MakePoint(lon, lat) <-> ST_MakePoint( sqlc.arg(lon)::float, sqlc.arg(lat)::float ) AS distance,
+	(
+	    ST_DistanceSphere(
+	        ST_MakePoint(lon, lat),
+	        ST_MakePoint( sqlc.arg(lon)::float, sqlc.arg(lat)::float )
+	    )
+	)::float AS distance,
 	created_at
 from stations
-where ebikes_available > 0
-order by distance asc
+where
+    ebikes_available > 0
+    and (
+        ST_DistanceSphere(
+            ST_MakePoint(lon, lat),
+            ST_MakePoint( sqlc.arg(lon)::float, sqlc.arg(lat)::float )
+        )
+    ) < 3000 -- approx. 2 miles
+order by distance
 limit 10;

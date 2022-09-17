@@ -20,11 +20,23 @@ select
 	ebikes_available,
 	bike_docks_available,
 	ebikes,
-	ST_MakePoint(lon, lat) <-> ST_MakePoint( $1::float, $2::float ) AS distance,
+	(
+	    ST_DistanceSphere(
+	        ST_MakePoint(lon, lat),
+	        ST_MakePoint( $1::float, $2::float )
+	    )
+	)::float AS distance,
 	created_at
 from stations
-where ebikes_available > 0
-order by distance asc
+where
+    ebikes_available > 0
+    and (
+        ST_DistanceSphere(
+            ST_MakePoint(lon, lat),
+            ST_MakePoint( $1::float, $2::float )
+        )
+    ) < 3000 -- approx. 2 miles
+order by distance
 limit 10
 `
 
@@ -41,7 +53,7 @@ type GetStationsRow struct {
 	EbikesAvailable    int32
 	BikeDocksAvailable int32
 	Ebikes             json.RawMessage
-	Distance           interface{}
+	Distance           float64
 	CreatedAt          time.Time
 }
 
