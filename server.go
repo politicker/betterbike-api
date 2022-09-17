@@ -85,11 +85,19 @@ func (s *Server) GetBikes(w http.ResponseWriter, r *http.Request) {
 
 		for idx, bike := range ebikes {
 			quarter := int((float64(bike.BatteryStatus.Percent)/100)*4) * 25
+			var gen string
+
+			if bike.MaxDistance() > 25 {
+				gen = "next-gen"
+			} else {
+				gen = "current-gen"
+			}
 
 			bikes = append(bikes, api.Bike{
 				ID:          fmt.Sprintf("%s-%d", station.ID, idx),
 				BatteryIcon: fmt.Sprintf("battery.%d", quarter),
 				Range:       fmt.Sprintf("%d %s", bike.BatteryStatus.DistanceRemaining.Value, bike.BatteryStatus.DistanceRemaining.Unit),
+				Gen:         gen,
 			})
 		}
 
