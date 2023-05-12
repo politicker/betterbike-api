@@ -44,7 +44,7 @@ values ($1,
         $5,
         $6,
         $7,
-        $8, now() at time zone 'utc');
+        $8, now() at time zone 'utc') ON CONFLICT (id, last_updated_ms) DO NOTHING;
 
 -- name: GetStations :many
 select id,
