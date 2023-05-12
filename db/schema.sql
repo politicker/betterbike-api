@@ -14,7 +14,7 @@ create table if not exists stations
 
 create table if not exists stations_timeseries
 (
-    id                   text primary key,
+    id                   text      not null,
     name                 text      not null,
     lat                  float     not null,
     lon                  float     not null,
@@ -22,5 +22,6 @@ create table if not exists stations_timeseries
     bike_docks_available int       not null default 0,
     ebikes               jsonb     not null default '{}',
     last_updated_ms      bigint    not null,
-    created_at           timestamp not null default now()
+    created_at           timestamp not null default now(),
+    PRIMARY KEY (id, last_updated_ms)
 );
