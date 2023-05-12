@@ -92,6 +92,22 @@ func (p *Poller) insertStationData(response *citibike.APIResponse) error {
 			p.logger.Error("error inserting station", zap.Error(err))
 			return err
 		}
+
+		err = p.queries.InsertStationTimeseries(context.TODO(), db.InsertStationTimeseriesParams{
+			ID:                 station.StationId,
+			Name:               station.StationName,
+			Lat:                station.Location.Lat,
+			Lon:                station.Location.Lng,
+			EbikesAvailable:    int32(station.EbikesAvailable),
+			BikeDocksAvailable: int32(station.BikeDocksAvailable),
+			Ebikes:             ebikesJson,
+			LastUpdatedMs:      station.LastUpdatedMs,
+		})
+		if err != nil {
+			sentry.CaptureException(err)
+			p.logger.Error("error inserting station", zap.Error(err))
+			return err
+		}
 	}
 
 	p.logger.Info("inserted station data")

@@ -3,9 +3,10 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"go.uber.org/zap"
 	"os"
 	"time"
+
+	"go.uber.org/zap"
 
 	"github.com/apoliticker/citibike/db"
 	"github.com/getsentry/sentry-go"
