@@ -92,7 +92,6 @@ func (p *Poller) insertStationData(response *citibike.APIResponse) error {
 			p.logger.Error("error inserting station", zap.Error(err))
 			return err
 		}
-		p.logger.Info("inserted station data")
 
 		err = p.queries.InsertStationTimeseries(context.TODO(), db.InsertStationTimeseriesParams{
 			ID:                 station.StationId,
@@ -109,8 +108,9 @@ func (p *Poller) insertStationData(response *citibike.APIResponse) error {
 			p.logger.Error("error inserting station_timeseries", zap.Error(err))
 			return err
 		}
-		p.logger.Info("inserted station_timeseries data")
 	}
+
+	p.logger.Info("inserted station and timeseries data")
 
 	return nil
 }
