@@ -35,8 +35,11 @@ func init() {
 	}
 
 	databaseURL = os.Getenv("DATABASE_URL")
-	logger.Info("connecting to db", zap.String("databaseURL", databaseURL))
+	if databaseURL == "" {
+		logger.Fatal("missing DATABASE_URL")
+	}
 
+	logger.Info("connecting to db", zap.String("databaseURL", databaseURL))
 	databaseURL = fmt.Sprintf("%s?sslmode=disable", databaseURL)
 
 	database, err := sql.Open("postgres", databaseURL)
@@ -66,9 +69,11 @@ func main() {
 	}
 
 	// TODO: Pass cancellable context to poller and server
+	logger.Info("starting poller")
 	poller := NewPoller(queries, logger.With(zap.String("context", "poller")), 1*time.Minute)
 	go poller.Start()
 
+	logger.Info("starting server")
 	srv := NewServer(port, queries, logger.With(zap.String("context", "server")))
 	srv.Start()
 
