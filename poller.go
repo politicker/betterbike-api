@@ -6,10 +6,11 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
-	"github.com/getsentry/sentry-go"
-	"go.uber.org/zap"
 	"net/http"
 	"time"
+
+	"github.com/getsentry/sentry-go"
+	"go.uber.org/zap"
 
 	"github.com/apoliticker/citibike/citibike"
 	"github.com/apoliticker/citibike/db"
@@ -98,10 +99,11 @@ func (p *Poller) insertStationData(response *citibike.APIResponse) error {
 			Name:               station.StationName,
 			Lat:                station.Location.Lat,
 			Lon:                station.Location.Lng,
+			BikesAvailable:     int32(station.BikesAvailable),
 			EbikesAvailable:    int32(station.EbikesAvailable),
 			BikeDocksAvailable: int32(station.BikeDocksAvailable),
-			Ebikes:             ebikesJson,
 			LastUpdatedMs:      station.LastUpdatedMs,
+			IsOffline:          station.IsOffline,
 		})
 		if err != nil {
 			sentry.CaptureException(err)
