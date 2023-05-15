@@ -32,11 +32,11 @@ insert into stations_timeseries (id,
                                  name,
                                  lat,
                                  lon,
-																 bikes_available,
+                                 bikes_available,
                                  ebikes_available,
                                  bike_docks_available,
                                  last_updated_ms,
-																 is_offline)
+                                 is_offline)
 values ($1,
         $2,
         $3,
@@ -45,7 +45,7 @@ values ($1,
         $6,
         $7,
         $8,
-				$9) ON CONFLICT (id, last_updated_ms) DO NOTHING;
+        $9) ON CONFLICT (id, last_updated_ms) DO NOTHING;
 
 -- name: GetStations :many
 select id,

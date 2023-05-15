@@ -1,40 +1,39 @@
-<!--
-	This is an example of a launchd plist file. If you're using macOS
-	you can use this to run the betterbike process in the background
-	using launchd.
-
-	To use this file, rename this example file e.g. com.companyname.betterbike.plist
-	and copy it to ~/Library/LaunchAgents/
- -->
-
-
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-<dict>
-    <key>Label</key>
-    <string>com.example.betterbike</string>
-    <key>ProgramArguments</key>
-    <array>
-				<!-- PATH TO EXECUTABLE -->
-        <string>/usr/local/bin/betterbike</string>
-    </array>
-    <key>KeepAlive</key>
-    <true/>
-    <key>RunAtLoad</key>
-    <true/>
-		<!-- PATH TO PROJECT DIR -->
-    <key>StandardOutPath</key>
-    <string>PATH_TO_REPOSITORY/betterbike-api/betterbike.log</string>
-
-		<!-- PATH TO PROJECT DIR -->
-    <key>StandardErrorPath</key>
-    <string>PATH_TO_REPOSITORY/betterbike-api/betterbike.log</string>
-    <key>EnvironmentVariables</key>
     <dict>
-				<!-- DATABASE URL -->
-        <key>DATABASE_URL</key>
-        <string>postgres://localhost:5432/citibike-dev</string>
+        <key>Label</key>
+        <string>com.example.betterbike</string>
+        <key>ProgramArguments</key>
+        <array>
+            <!-- PATH TO EXECUTABLE -->
+            <string>/usr/local/bin/betterbike</string>
+        </array>
+        <key>KeepAlive</key>
+        <true/>
+        <key>RunAtLoad</key>
+        <true/>
+        <!-- PATH TO PROJECT DIR -->
+        <key>StandardOutPath</key>
+        <string>PATH_TO_REPOSITORY/betterbike-api/betterbike.log</string>
+
+        <!-- PATH TO PROJECT DIR -->
+        <key>StandardErrorPath</key>
+        <string>PATH_TO_REPOSITORY/betterbike-api/betterbike.log</string>
+        <key>EnvironmentVariables</key>
+        <dict>
+            <!-- DATABASE URL -->
+            <key>DATABASE_URL</key>
+            <string>postgres://localhost:5432/citibike-dev</string>
+        </dict>
     </dict>
-</dict>
 </plist>
+
+<!--
+    This is an example of a launchd plist file. If you're using macOS
+    you can use this to run the betterbike process in the background
+    using launchd.
+
+    To use this file, rename this example file e.g. com.companyname.betterbike.plist
+    and copy it to ~/Library/LaunchAgents/
+ -->
