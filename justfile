@@ -24,3 +24,11 @@ load:
 
 unload:
 	launchctl unload ~/Library/LaunchAgents/com.pumpfactory.betterbike.plist
+
+
+deploy:
+	rm /usr/local/bin/betterbike && \
+	go build -o /usr/local/bin/betterbike && \
+	just unload && \
+	just copy-plist && \
+	just load
