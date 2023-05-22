@@ -32,3 +32,7 @@ deploy:
 	just unload && \
 	just copy-plist && \
 	just load
+
+dump:
+	./bin/dump-database
+

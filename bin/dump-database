@@ -1,0 +1,15 @@
+#!/bin/bash
+
+project_dir=$(dirname "$(dirname "$(realpath "$0")")")
+data_dir="$project_dir/data"
+
+current_date=$(date +'%Y-%m-%d')
+filename="dump_${current_date}.sql"
+file_path="$data_dir/$filename"
+
+dump_command="pg_dump --no-owner -f $file_path citibike-dev"
+
+# Run the dump command using the variable "$dump_command"
+$dump_command
+
+echo "Dump file created: $file_path"

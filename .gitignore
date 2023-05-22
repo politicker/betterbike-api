@@ -3,3 +3,4 @@ credentials
 __debug_bin
 *.log
 com.*.plist
+data/*
