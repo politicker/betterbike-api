@@ -1,27 +1,91 @@
-query GetSystemSupply {
-  supply {
+fragment NoticeFields on Notice {
+  localizedTitle
+  localizedDescription
+  url
+  __typename
+}
+
+query GetSupply($input: SupplyInput) {
+  supply(input: $input) {
     stations {
       stationId
       stationName
       location {
         lat
         lng
+        __typename
       }
       bikesAvailable
       bikeDocksAvailable
       ebikesAvailable
+      scootersAvailable
       totalBikesAvailable
+      totalRideablesAvailable
+      isValet
       isOffline
+      isLightweight
+      notices {
+        ...NoticeFields
+        __typename
+      }
+      siteId
       ebikes {
+        rideableName
         batteryStatus {
           distanceRemaining {
             value
             unit
+            __typename
           }
           percent
+          __typename
         }
+        __typename
+      }
+      scooters {
+        rideableName
+        batteryStatus {
+          distanceRemaining {
+            value
+            unit
+            __typename
+          }
+          percent
+          __typename
+        }
+        __typename
       }
       lastUpdatedMs
+      __typename
     }
+    rideables {
+      rideableId
+      location {
+        lat
+        lng
+        __typename
+      }
+      rideableType
+      photoUrl
+      batteryStatus {
+        distanceRemaining {
+          value
+          unit
+          __typename
+        }
+        percent
+        __typename
+      }
+      __typename
+    }
+    notices {
+      ...NoticeFields
+      __typename
+    }
+    requestErrors {
+      ...NoticeFields
+      __typename
+    }
+    __typename
   }
 }
