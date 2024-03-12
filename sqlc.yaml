@@ -1,7 +1,11 @@
-version: 1
-packages:
-  - path: "db"
-    name: "db"
-    engine: "postgresql"
-    schema: "db/schema.sql"
+version: "2"
+sql:
+  - engine: "postgresql"
     queries: "db/query.sql"
+    schema: "db/schema.sql"
+    database:
+      uri: "postgres://localhost:5432/betterbike?sslmode=disable"
+    gen:
+      go:
+        package: "db"
+        out: "db"
