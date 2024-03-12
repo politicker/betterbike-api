@@ -2,13 +2,13 @@ set dotenv-load
 
 setup:
 	brew bundle && \
-	createdb citibike-dev
+	createdb betterbike
 
 gen:
 	sqlc generate
 
 resetdb:
-	dropdb citibike-dev && createdb citibike-dev && psql citibike-dev < db/schema.sql
+	dropdb betterbike && createdb betterbike && psql betterbike < db/schema.sql
 
 build:
 	go build -o betterbike
