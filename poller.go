@@ -144,10 +144,10 @@ func (p *Poller) fetchStationData() (*citibike.APIResponse, error) {
 		Variables: Variables{
 			Input: Input{
 				RegionCode:        "BKN",
-				RideablePageLimit: 1000, // Assuming RideablePageLimit is of type int
+				RideablePageLimit: 1000,
 			},
 		},
-		Query: citibikeAPIQuery, // Ensure citibikeAPIQuery is defined and is a string
+		Query: citibikeAPIQuery,
 	})
 	if err != nil {
 		return nil, err
