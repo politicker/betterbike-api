@@ -20,7 +20,7 @@ import (
 var citibikeAPIQuery string
 
 const (
-	baseURL = "https://account.citibikenyc.com/bikesharefe-gql"
+	baseURL = "https://citibikenyc.com/bikesharefe-gql"
 )
 
 type Poller struct {
@@ -117,9 +117,37 @@ func (p *Poller) insertStationData(response *citibike.APIResponse) error {
 	return nil
 }
 
+type fetchStationParams struct {
+	OperationName string            `json:"operationName"`
+	Variables     map[string]string `json:"variables"`
+	Query         string            `json:"query"`
+}
+
+type GraphQLRequest struct {
+	OperationName string    `json:"operationName"`
+	Variables     Variables `json:"variables"`
+	Query         string    `json:"query"`
+}
+
+type Variables struct {
+	Input Input `json:"input"`
+}
+
+type Input struct {
+	RegionCode        string `json:"regionCode"`
+	RideablePageLimit int    `json:"rideablePageLimit"`
+}
+
 func (p *Poller) fetchStationData() (*citibike.APIResponse, error) {
-	jsonPayload, err := json.Marshal(map[string]string{
-		"query": citibikeAPIQuery,
+	jsonPayload, err := json.Marshal(GraphQLRequest{
+		OperationName: "GetSupply",
+		Variables: Variables{
+			Input: Input{
+				RegionCode:        "BKN",
+				RideablePageLimit: 1000, // Assuming RideablePageLimit is of type int
+			},
+		},
+		Query: citibikeAPIQuery, // Ensure citibikeAPIQuery is defined and is a string
 	})
 	if err != nil {
 		return nil, err
