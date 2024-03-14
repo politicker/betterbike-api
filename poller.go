@@ -10,10 +10,9 @@ import (
 	"time"
 
 	"github.com/getsentry/sentry-go"
+	"github.com/politicker/betterbike-api/internal/citibike"
+	"github.com/politicker/betterbike-api/internal/db"
 	"go.uber.org/zap"
-
-	"github.com/apoliticker/citibike/citibike"
-	"github.com/apoliticker/citibike/db"
 )
 
 //go:embed query.graphql
@@ -117,13 +116,7 @@ func (p *Poller) insertStationData(response *citibike.APIResponse) error {
 	return nil
 }
 
-type fetchStationParams struct {
-	OperationName string            `json:"operationName"`
-	Variables     map[string]string `json:"variables"`
-	Query         string            `json:"query"`
-}
-
-type GraphQLRequest struct {
+type StationSupplyRequest struct {
 	OperationName string    `json:"operationName"`
 	Variables     Variables `json:"variables"`
 	Query         string    `json:"query"`
@@ -139,7 +132,7 @@ type Input struct {
 }
 
 func (p *Poller) fetchStationData() (*citibike.APIResponse, error) {
-	jsonPayload, err := json.Marshal(GraphQLRequest{
+	jsonPayload, err := json.Marshal(StationSupplyRequest{
 		OperationName: "GetSupply",
 		Variables: Variables{
 			Input: Input{

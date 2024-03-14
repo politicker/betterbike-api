@@ -8,11 +8,10 @@ import (
 	"time"
 
 	"github.com/getsentry/sentry-go"
+	"github.com/politicker/betterbike-api/internal/api"
+	"github.com/politicker/betterbike-api/internal/citibike"
+	"github.com/politicker/betterbike-api/internal/db"
 	"go.uber.org/zap"
-
-	"github.com/apoliticker/citibike/api"
-	"github.com/apoliticker/citibike/citibike"
-	"github.com/apoliticker/citibike/db"
 )
 
 type Server struct {

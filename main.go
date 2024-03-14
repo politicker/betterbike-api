@@ -8,9 +8,9 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/apoliticker/citibike/db"
 	"github.com/getsentry/sentry-go"
 	_ "github.com/lib/pq"
+	"github.com/politicker/betterbike-api/internal/db"
 	_ "github.com/politicker/zap-sink-datadog"
 )
 

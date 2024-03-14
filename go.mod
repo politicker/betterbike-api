@@ -1,4 +1,4 @@
-module github.com/apoliticker/citibike
+module github.com/politicker/betterbike-api
 
 go 1.22
 
