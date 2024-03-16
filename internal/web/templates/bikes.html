@@ -1,11 +1,11 @@
 {{define "body"}}
 <main>
-    {{range .Stations}}
-    <div>
-        <h2>{{.Name}}</h2>
-        <p>{{.Distance}}</p>
-        <button hx-get="/bikes/{{.ID}}">Details</button>
-    </div>
-    {{end}}
+	{{range .Stations}}
+	<div>
+		<h2>{{.Name}}</h2>
+		<p>{{.Distance}}</p>
+		<button hx-get="/bikes/{{.ID}}">Details</button>
+	</div>
+	{{end}}
 </main>
 {{end}}
