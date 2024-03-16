@@ -1,11 +1,11 @@
 version: "2"
 sql:
   - engine: "postgresql"
-    queries: "db/query.sql"
-    schema: "db/schema.sql"
+    queries: "internal/db/query.sql"
+    schema: "internal/db/schema.sql"
     database:
-      uri: "postgres://localhost:5432/betterbike?sslmode=disable"
+      uri: "postgres:///betterbike?port=5432&host=/var/run/postgresql&sslmode=disable"
     gen:
       go:
         package: "db"
-        out: "db"
+        out: "internal/db"

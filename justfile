@@ -8,7 +8,7 @@ gen:
 	sqlc generate
 
 resetdb:
-	dropdb betterbike && createdb betterbike && psql betterbike < db/schema.sql
+	dropdb betterbike && createdb betterbike && psql betterbike < internal/db/schema.sql
 
 build:
 	go build -o betterbike
