@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"os"
@@ -11,6 +12,7 @@ import (
 	"github.com/getsentry/sentry-go"
 	_ "github.com/lib/pq"
 	"github.com/politicker/betterbike-api/internal/db"
+	"github.com/politicker/betterbike-api/internal/web"
 	_ "github.com/politicker/zap-sink-datadog"
 )
 
@@ -75,7 +77,11 @@ func main() {
 
 	logger.Info("starting server")
 	srv := NewServer(port, queries, logger.With(zap.String("context", "server")))
-	srv.Start()
+	go srv.Start()
+
+	logger.Info("starting html server", zap.String("port", port))
+	wsrv := web.NewWeb(context.Background(), logger.With(zap.String("context", "html-server")), queries, "8001")
+	wsrv.Start()
 
 	logger.Sync()
 }
