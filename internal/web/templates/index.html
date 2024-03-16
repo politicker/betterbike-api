@@ -1,5 +1,10 @@
 {{define "body"}}
-<button onclick="getCurrentPosition()">Give location permission</button>
+<main>
+	<p class="explainer">
+		Betterbike needs your location to find the Citibike stations closest to you.
+	</p>
+	<button onclick="getCurrentPosition()">Give location permission</button>
+</main>
 
 <script>
 	function getCurrentPosition() {

@@ -40,7 +40,7 @@ nav {
     padding: 16px;
 }
 
-nav img {
+nav a {
     width: 50px;
 }
 
@@ -53,13 +53,26 @@ main {
     margin: 0 auto;
 }
 
+.explainer {
+    text-align: center;
+    color: var(--light-color);
+}
+
+button {
+    padding: 8px 16px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-size: var(--font-sm);
+}
+
 .card {
     display: flex;
     flex-direction: column;
     background-color: var(--light-color);
     padding: 20px;
     border-radius: 10px;
-    width: 420px;
+    /* width: 420px; */
     gap: 24px;
 }
 
