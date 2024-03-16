@@ -4,3 +4,4 @@ __debug_bin
 *.log
 com.*.plist
 /data
+__debug_bin*
