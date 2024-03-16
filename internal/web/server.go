@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/politicker/betterbike-api/internal/api"
@@ -127,11 +128,23 @@ func (s *Server) bikesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var stationParams db.GetStationsParams
-	err = json.NewDecoder(r.Body).Decode(&stationParams)
+	latStr := r.URL.Query().Get("lat")
+	lonStr := r.URL.Query().Get("lon")
+
+	lat, err := strconv.ParseFloat(latStr, 64)
 	if err != nil {
-		s.renderError(w, "lat and lon are required", "invalid-json-payload")
+		s.renderError(w, "invalid lat", "invalid-lat")
 		return
 	}
+
+	lon, err := strconv.ParseFloat(lonStr, 64)
+	if err != nil {
+		s.renderError(w, "invalid lon", "invalid-lon")
+		return
+	}
+
+	stationParams.Lat = lat
+	stationParams.Lon = lon
 
 	if stationParams.Lat == 0 || stationParams.Lon == 0 {
 		s.renderError(w, fmt.Sprintf("invalid lat or lon: %f, %f", stationParams.Lat, stationParams.Lon), "missing-coords")
@@ -148,7 +161,7 @@ func (s *Server) bikesHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = tmpl.Execute(w, api.Home{LastUpdated: stations[0].CreatedAt, Stations: stations})
+	err = tmpl.ExecuteTemplate(w, "layout.html", api.Home{LastUpdated: stations[0].CreatedAt, Stations: stations})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

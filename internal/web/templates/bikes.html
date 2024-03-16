@@ -6,6 +6,8 @@
 		<p>{{.Distance}}</p>
 		<button hx-get="/bikes/{{.ID}}">Details</button>
 	</div>
+	{{else}}
+	<p>No stations found</p>
 	{{end}}
 </main>
 {{end}}

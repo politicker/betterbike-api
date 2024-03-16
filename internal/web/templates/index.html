@@ -1,10 +1,14 @@
 {{define "body"}}
-<script>
-	navigator.geolocation.getCurrentPosition((position) => {
-		let lat = position.coords.latitude
-		let long = position.coords.longitude
+<button onclick="getCurrentPosition()">Give location permission</button>
 
-		window.location.href = `/bikes?lat=${lat}&long=${long}`
-	})
+<script>
+	function getCurrentPosition() {
+		navigator.geolocation.getCurrentPosition((position) => {
+			let lat = position.coords.latitude
+			let long = position.coords.longitude
+
+			window.location.href = `/bikes?lat=${lat}&lon=${long}`
+		})
+	}
 </script>
 {{end}}
