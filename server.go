@@ -7,24 +7,25 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/getsentry/sentry-go"
 	"github.com/politicker/betterbike-api/internal/api"
-	"github.com/politicker/betterbike-api/internal/citibike"
 	"github.com/politicker/betterbike-api/internal/db"
+	"github.com/politicker/betterbike-api/internal/domain"
 	"go.uber.org/zap"
 )
 
 type Server struct {
-	logger  *zap.Logger
-	queries *db.Queries
-	port    string
+	logger    *zap.Logger
+	queries   *db.Queries
+	port      string
+	bikesRepo *domain.BikesRepo
 }
 
 func NewServer(port string, queries *db.Queries, logger *zap.Logger) Server {
 	return Server{
-		queries: queries,
-		port:    port,
-		logger:  logger,
+		queries:   queries,
+		port:      port,
+		logger:    logger,
+		bikesRepo: domain.NewBikesRepo(queries, logger),
 	}
 }
 
@@ -63,48 +64,11 @@ func (s *Server) GetBikes(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	stations, err := s.queries.GetStations(ctx, stationParams)
+	stations, err := s.bikesRepo.GetNearbyStationEbikes(ctx, stationParams)
 	if err != nil {
-		sentry.CaptureException(err)
-		s.renderError(w, err.Error(), "get-stations-failed")
+		s.renderError(w, "error fetching stations", "internal-error")
 		return
 	}
-
-	var viewStations []api.Station
-
-	for _, station := range stations {
-		var bikes []api.Bike
-		var ebikes []citibike.Ebike
-
-		err = json.Unmarshal(station.Ebikes, &ebikes)
-		if err != nil {
-			s.renderError(w, err.Error(), "invalid-json-ebikes")
-			return
-		}
-
-		for idx, bike := range ebikes {
-			quarter := int((float64(bike.BatteryStatus.Percent)/100)*4) * 25
-			var isNextGen = bike.MaxDistance() > 25
-
-			bikes = append(bikes, api.Bike{
-				ID:          fmt.Sprintf("%s-%d", station.ID, idx),
-				BatteryIcon: fmt.Sprintf("battery.%d", quarter),
-				Range:       fmt.Sprintf("%d %s", bike.BatteryStatus.DistanceRemaining.Value, bike.BatteryStatus.DistanceRemaining.Unit),
-				IsNextGen:   isNextGen,
-			})
-		}
-
-		viewStations = append(viewStations, api.Station{
-			ID:        station.ID,
-			Name:      station.Name,
-			BikeCount: fmt.Sprint(station.EbikesAvailable),
-			Bikes:     bikes,
-			Lat:       station.Lat,
-			Lon:       station.Lon,
-			Distance:  station.Distance,
-		})
-	}
-
 	if len(stations) == 0 {
 		s.renderError(w, "No ebikes nearby. Are you in New York City?", "too-far-away")
 		return
@@ -112,7 +76,7 @@ func (s *Server) GetBikes(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(api.Home{
 		LastUpdated: stations[0].CreatedAt,
-		Stations:    viewStations,
+		Stations:    stations,
 	})
 
 	s.logger.Info(
