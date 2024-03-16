@@ -34,6 +34,16 @@ body {
     color: var(--dark-color);
 }
 
+nav {
+    display: flex;
+    justify-content: center;
+    padding: 16px;
+}
+
+nav img {
+    width: 50px;
+}
+
 main {
     display: flex;
     flex-direction: column;
@@ -114,4 +124,23 @@ main {
     background-color: #4CAF50;
     border-radius: 10px;
     transition: width 0.5s ease-in-out;
+}
+
+footer {
+    display: flex;
+    justify-content: center;
+}
+
+footer a {
+    border-radius: 999px;
+    border: 2px solid;
+    /* padding: 13px; */
+    width: 25px;
+    height: 25px;
+    text-align: center;
+    margin: 16px;
+    color: white;
+    line-height: 25px;
+    font-family: cursive;
+    text-decoration: none;
 }
