@@ -4,7 +4,11 @@
 	<div class="card">
 		<div class="card-header">
 			<div class="stacked">
-				<h2>{{.Name}}</h2>
+				<a
+					href="https://www.google.com/maps/dir/?api=1&destination={{.Lat}},{{.Lon}}&travelmode=walking"
+				>
+					<h2>{{.Name}}</h2>
+				</a>
 				<p>{{.BikeCount}} bikes</p>
 			</div>
 			<p>{{.PrettyDistance}}</p>

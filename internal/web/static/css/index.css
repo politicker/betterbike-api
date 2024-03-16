@@ -74,7 +74,6 @@ button {
     border-radius: 10px;
     width: 420px;
     gap: 24px;
-    max-width: 300px;
 }
 
 .card-header {
@@ -86,10 +85,16 @@ button {
     overflow: hidden;
 }
 
+.card-header a {
+    text-decoration: underline;
+    color: var(--dark-color);
+}
+
 .card-header h2 {
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+    font-size: var(--font-sm);
 }
 
 .card-header p {
