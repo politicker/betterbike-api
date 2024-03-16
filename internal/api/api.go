@@ -1,12 +1,17 @@
 package api
 
-import "time"
+import (
+	"html/template"
+	"time"
+)
 
 type Bike struct {
-	ID          string `json:"id"`
-	Range       string `json:"range"`
-	BatteryIcon string `json:"batteryIcon"`
-	IsNextGen   bool   `json:"isNextGen"`
+	ID                string       `json:"id"`
+	Range             string       `json:"range"`
+	BatteryIcon       string       `json:"batteryIcon"`
+	BatteryColor      template.CSS `json:"batteryColor"`
+	BatteryPercentage string       `json:"batteryPercentage"`
+	IsNextGen         bool         `json:"isNextGen"`
 }
 
 type Station struct {

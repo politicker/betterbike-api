@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"html/template"
+
 	"github.com/getsentry/sentry-go"
 	"github.com/politicker/betterbike-api/internal/api"
 	"github.com/politicker/betterbike-api/internal/citibike"
@@ -51,11 +53,23 @@ func (b *BikesRepo) GetNearbyStationEbikes(ctx context.Context, params db.GetSta
 			quarter := int((float64(bike.BatteryStatus.Percent)/100)*4) * 25
 			var isNextGen = bike.MaxDistance() > 25
 
+			var color string
+			switch {
+			case bike.BatteryStatus.Percent <= 33:
+				color = "var(--danger-color)"
+			case bike.BatteryStatus.Percent <= 66:
+				color = "var(--warning-color)"
+			default:
+				color = "var(--success-color)"
+			}
+
 			bikes = append(bikes, api.Bike{
-				ID:          fmt.Sprintf("%s-%d", station.ID, idx),
-				BatteryIcon: fmt.Sprintf("battery.%d", quarter),
-				Range:       fmt.Sprintf("%d %s", bike.BatteryStatus.DistanceRemaining.Value, bike.BatteryStatus.DistanceRemaining.Unit),
-				IsNextGen:   isNextGen,
+				ID:                fmt.Sprintf("%s-%d", station.ID, idx),
+				BatteryIcon:       fmt.Sprintf("battery.%d", quarter),
+				BatteryColor:      template.CSS(color),
+				BatteryPercentage: fmt.Sprintf("%d%%", bike.BatteryStatus.Percent),
+				Range:             fmt.Sprintf("%d %s", bike.BatteryStatus.DistanceRemaining.Value, bike.BatteryStatus.DistanceRemaining.Unit),
+				IsNextGen:         isNextGen,
 			})
 		}
 

@@ -1,10 +1,27 @@
 {{define "body"}}
 <main>
 	{{range .Stations}}
-	<div>
-		<h2>{{.Name}}</h2>
-		<p>{{.PrettyDistance}}</p>
-		<!--		<button hx-get="/bikes/{{.ID}}">Details</button>-->
+	<div class="card">
+		<div class="card-header">
+			<div class="stacked">
+				<h2>{{.Name}}</h2>
+				<p>{{.BikeCount}} bikes</p>
+			</div>
+			<p>{{.PrettyDistance}}</p>
+		</div>
+		{{ range .Bikes }}
+		<div class="bike">
+			<p>{{.Range}}</p>
+			<p>{{.IsNextGen}}</p>
+			<p>Battery</p>
+			<div class="progress-bar">
+				<div
+					class="progress-fill"
+					style="width: {{.BatteryPercentage}}; background-color: {{.BatteryColor}};"
+				></div>
+			</div>
+		</div>
+		{{end}}
 	</div>
 	{{else}}
 	<p>No stations found</p>
