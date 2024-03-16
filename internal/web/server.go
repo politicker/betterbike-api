@@ -39,9 +39,11 @@ func NewServer(ctx context.Context, logger *zap.Logger, queries *db.Queries, por
 }
 
 func (s *Server) Start() error {
+	fs := http.FileServer(http.FS(staticFiles))
 	http.HandleFunc("GET /api", s.GetBikes)
 	http.HandleFunc("GET /", s.indexHandler)
 	http.HandleFunc("GET /bikes", s.bikesHandler)
+	http.Handle("GET /static/", fs)
 
 	s.logger.Info("listening", zap.String("port", s.port))
 	return http.ListenAndServe(":"+s.port, nil)

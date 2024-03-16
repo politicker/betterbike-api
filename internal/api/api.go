@@ -10,14 +10,15 @@ type Bike struct {
 }
 
 type Station struct {
-	ID        string    `json:"id"`
-	Name      string    `json:"name"`
-	BikeCount string    `json:"bikeCount"`
-	Bikes     []Bike    `json:"bikes"`
-	Lat       float64   `json:"lat"`
-	Lon       float64   `json:"lon"`
-	Distance  float64   `json:"distance"`
-	CreatedAt time.Time `json:"createdAt"`
+	ID             string    `json:"id"`
+	Name           string    `json:"name"`
+	BikeCount      string    `json:"bikeCount"`
+	Bikes          []Bike    `json:"bikes"`
+	Lat            float64   `json:"lat"`
+	Lon            float64   `json:"lon"`
+	Distance       float64   `json:"distance"`
+	PrettyDistance string    `json:"prettyDistance"`
+	CreatedAt      time.Time `json:"createdAt"`
 }
 
 type Home struct {

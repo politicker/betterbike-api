@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-
 	"github.com/getsentry/sentry-go"
 	"github.com/politicker/betterbike-api/internal/api"
 	"github.com/politicker/betterbike-api/internal/citibike"
@@ -23,6 +22,8 @@ func NewBikesRepo(queries *db.Queries, logger *zap.Logger) *BikesRepo {
 		logger:  logger,
 	}
 }
+
+const MetersToFeet = 3.28084
 
 // GetNearbyStationEbikes returns a list of nearby
 // ebike availability based on the users location.
@@ -59,14 +60,15 @@ func (b *BikesRepo) GetNearbyStationEbikes(ctx context.Context, params db.GetSta
 		}
 
 		viewStations = append(viewStations, api.Station{
-			ID:        station.ID,
-			Name:      station.Name,
-			BikeCount: fmt.Sprint(station.EbikesAvailable),
-			Bikes:     bikes,
-			Lat:       station.Lat,
-			Lon:       station.Lon,
-			Distance:  station.Distance,
-			CreatedAt: station.CreatedAt,
+			ID:             station.ID,
+			Name:           station.Name,
+			BikeCount:      fmt.Sprint(station.EbikesAvailable),
+			Bikes:          bikes,
+			Lat:            station.Lat,
+			Lon:            station.Lon,
+			Distance:       station.Distance,
+			PrettyDistance: fmt.Sprintf("%d feet", int(station.Distance*MetersToFeet)),
+			CreatedAt:      station.CreatedAt,
 		})
 	}
 

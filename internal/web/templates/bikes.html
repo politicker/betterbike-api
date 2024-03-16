@@ -3,8 +3,8 @@
 	{{range .Stations}}
 	<div>
 		<h2>{{.Name}}</h2>
-		<p>{{.Distance}}</p>
-		<button hx-get="/bikes/{{.ID}}">Details</button>
+		<p>{{.PrettyDistance}}</p>
+		<!--		<button hx-get="/bikes/{{.ID}}">Details</button>-->
 	</div>
 	{{else}}
 	<p>No stations found</p>
