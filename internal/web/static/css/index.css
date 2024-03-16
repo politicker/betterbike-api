@@ -50,7 +50,7 @@ main {
     padding: 20px;
     border-radius: 10px;
     width: 420px;
-    gap: 12px;
+    gap: 24px;
 }
 
 .card-header {
@@ -86,6 +86,14 @@ main {
     font-size: var(--font-lg);
     font-weight: bold;
     color: var(--dark-color);
+}
+
+.bikes-list {
+    display: grid;
+    grid-template-columns: min-content minmax(100px, 1fr) min-content minmax(100px, 1fr);
+    align-items: baseline;
+    gap: 10px;
+    justify-items: start;
 }
 
 .station-name {

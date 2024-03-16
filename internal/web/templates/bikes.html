@@ -9,19 +9,18 @@
 			</div>
 			<p>{{.PrettyDistance}}</p>
 		</div>
-		{{ range .Bikes }}
-		<div class="bike">
-			<p>{{.Range}}</p>
-			<p>{{.IsNextGen}}</p>
-			<p>Battery</p>
+		<div class="bikes-list">
+			{{ range .Bikes }}
+			<p style="white-space: nowrap">{{.Range}}</p>
+			<!-- <p>{{.IsNextGen}}</p> -->
 			<div class="progress-bar">
 				<div
 					class="progress-fill"
 					style="width: {{.BatteryPercentage}}; background-color: {{.BatteryColor}};"
 				></div>
 			</div>
+			{{end}}
 		</div>
-		{{end}}
 	</div>
 	{{else}}
 	<p>No stations found</p>
