@@ -27,6 +27,7 @@ body {
 }
 
 * {
+	box-sizing: border-box;
 	margin: 0;
 	padding: 0;
 }
@@ -50,9 +51,10 @@ main {
 	display: flex;
 	flex-direction: column;
 	gap: 16px;
-	max-width: 800px;
+	max-width: 1600px;
 	align-items: center;
 	margin: 0 auto;
+	padding: 0 32px;
 }
 
 .explainer {
@@ -74,8 +76,8 @@ button {
 	background-color: var(--light-color);
 	padding: 20px;
 	border-radius: 10px;
-	width: 420px;
 	gap: 24px;
+	width: 100%;
 }
 
 .card-header {
@@ -121,13 +123,22 @@ button {
 
 .bikes-list {
 	display: grid;
-	grid-template-columns: min-content minmax(40px, 1fr) min-content minmax(
-			40px,
-			1fr
-		);
+	grid-template-columns: repeat(2, min-content minmax(40px, 1fr));
 	align-items: baseline;
 	gap: 10px;
 	justify-items: start;
+
+	@media (max-width: 380px) {
+		grid-template-columns: repeat(1, min-content minmax(40px, 1fr));
+	}
+
+	@media (min-width: 600px) {
+		grid-template-columns: repeat(3, min-content minmax(40px, 1fr));
+	}
+
+	@media (min-width: 1000px) {
+		grid-template-columns: repeat(4, min-content minmax(40px, 1fr));
+	}
 }
 
 .station-name {
@@ -167,10 +178,4 @@ footer a {
 	line-height: 25px;
 	font-family: cursive;
 	text-decoration: none;
-}
-
-@media (max-width: 600px) {
-	.card {
-		width: 300px;
-	}
 }
