@@ -27,9 +27,12 @@ UPDATE
     name = EXCLUDED.name,
     lat = EXCLUDED.lat,
     lon = EXCLUDED.lon,
+    bikes_available = EXCLUDED.bikes_available,
     ebikes_available = EXCLUDED.ebikes_available,
-    bike_docks_available = EXCLUDED.bike_docks_available,
     ebikes = EXCLUDED.ebikes,
+    bike_docks_available = EXCLUDED.bike_docks_available,
+    last_updated_ms = EXCLUDED.last_updated_ms,
+    is_offline = EXCLUDED.is_offline,
     created_at = now() at time zone 'utc';
 
 -- InsertStationTimeseries appends station data to the timeseries table.
