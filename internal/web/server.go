@@ -168,7 +168,11 @@ func (s *Server) bikesHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = tmpl.ExecuteTemplate(w, "layout.html", api.Home{LastUpdated: stations[0].CreatedAt, Stations: stations})
+	err = tmpl.ExecuteTemplate(w, "layout.html", api.Home{
+		LastUpdated: stations[0].CreatedAt,
+		Stations:    stations,
+		Lat:         &lat,
+		Lon:         &lon})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

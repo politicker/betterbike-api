@@ -11,7 +11,7 @@
 		></script>
 		<link rel="stylesheet" href="/static/css/index.css" />
 	</head>
-	<body>
+	<body {{if .Lat}}hx-get="/bikes?lat={{.Lat}}&lon={{.Lon}}"{{end}} {{if .Lat}}hx-trigger="every 10s"{{end}}></body>
 		<nav>
 			<a href="/">
 				<img src="/static/images/logo.svg" alt="" />
