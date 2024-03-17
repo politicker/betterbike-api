@@ -17,18 +17,17 @@ run:
 	go run .
 
 copy-plist:
-	cp -f com.pumpfactory.betterbike.plist ~/Library/LaunchAgents/
+	cp -f com.betterbike.plist ~/Library/LaunchAgents/
 
 load:
-	launchctl load ~/Library/LaunchAgents/com.pumpfactory.betterbike.plist
+	launchctl load ~/Library/LaunchAgents/com.betterbike.plist
 
 unload:
-	launchctl unload ~/Library/LaunchAgents/com.pumpfactory.betterbike.plist
-
+	launchctl unload ~/Library/LaunchAgents/com.betterbike.plist
 
 deploy:
-	rm /usr/local/bin/betterbike && \
-	go build -o /usr/local/bin/betterbike && \
+	rm betterbike-api && \
+	go build betterbike-api && \
 	just unload && \
 	just copy-plist && \
 	just load

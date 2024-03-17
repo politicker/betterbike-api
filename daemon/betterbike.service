@@ -1,0 +1,19 @@
+[Unit]
+Description=Webserver for betterbike
+
+[Service]
+ExecStart=/home/quinn/.config/bin/betterbike web
+Restart=always
+
+# user and group under which the service will run
+# User=harrison
+# Group=staff
+
+# Set environment vars
+Environment="DATABASE_URL=postgresql:///betterbike?host=/var/run/postgresql" "PORT=8001" "SITE_TITLE=Quinn's Lifts"
+
+# Working directory
+WorkingDirectory=/home/quinn/.config/bin
+
+[Install]
+WantedBy=multi-user.target
