@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"os"
 	"time"
 
@@ -42,7 +41,6 @@ func init() {
 	}
 
 	logger.Info("connecting to db", zap.String("databaseURL", databaseURL))
-	databaseURL = fmt.Sprintf("%s?sslmode=disable", databaseURL)
 
 	database, err := sql.Open("postgres", databaseURL)
 	if err != nil {
