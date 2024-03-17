@@ -16,9 +16,12 @@ select id,
        name,
        lat,
        lon,
+       bikes_available,
        ebikes_available,
-       bike_docks_available,
        ebikes,
+       bike_docks_available,
+       last_updated_ms,
+       is_offline,
        (
            ST_DistanceSphere(
                    ST_MakePoint(lon, lat),
@@ -46,9 +49,12 @@ type GetStationsRow struct {
 	Name               string
 	Lat                float64
 	Lon                float64
+	BikesAvailable     int32
 	EbikesAvailable    int32
-	BikeDocksAvailable int32
 	Ebikes             json.RawMessage
+	BikeDocksAvailable int32
+	LastUpdatedMs      int64
+	IsOffline          bool
 	Distance           float64
 	CreatedAt          time.Time
 }
@@ -67,9 +73,12 @@ func (q *Queries) GetStations(ctx context.Context, arg GetStationsParams) ([]Get
 			&i.Name,
 			&i.Lat,
 			&i.Lon,
+			&i.BikesAvailable,
 			&i.EbikesAvailable,
-			&i.BikeDocksAvailable,
 			&i.Ebikes,
+			&i.BikeDocksAvailable,
+			&i.LastUpdatedMs,
+			&i.IsOffline,
 			&i.Distance,
 			&i.CreatedAt,
 		); err != nil {
@@ -87,14 +96,17 @@ func (q *Queries) GetStations(ctx context.Context, arg GetStationsParams) ([]Get
 }
 
 const insertStation = `-- name: InsertStation :exec
-insert into stations (id,
-                      name,
-                      lat,
-                      lon,
-                      ebikes_available,
-                      bike_docks_available,
-                      ebikes,
-                      created_at)
+insert into stations(            id,
+                                 name,
+                                 lat,
+                                 lon,
+                                 bikes_available,
+                                 ebikes,
+                                 ebikes_available,
+                                 bike_docks_available,
+                                 last_updated_ms,
+                                 is_offline,
+                                 created_at)
 values ($1,
         $2,
         $3,
@@ -102,10 +114,13 @@ values ($1,
         $5,
         $6,
         $7,
+        $8,
+        $9,
+        $10,
         now() at time zone 'utc') ON CONFLICT (id) DO
 UPDATE
     SET
-        name = EXCLUDED.name,
+    name = EXCLUDED.name,
     lat = EXCLUDED.lat,
     lon = EXCLUDED.lon,
     ebikes_available = EXCLUDED.ebikes_available,
@@ -119,9 +134,12 @@ type InsertStationParams struct {
 	Name               string
 	Lat                float64
 	Lon                float64
+	BikesAvailable     int32
+	Ebikes             json.RawMessage
 	EbikesAvailable    int32
 	BikeDocksAvailable int32
-	Ebikes             json.RawMessage
+	LastUpdatedMs      int64
+	IsOffline          bool
 }
 
 // InsertStation inserts citibike station data into the database.
@@ -131,9 +149,12 @@ func (q *Queries) InsertStation(ctx context.Context, arg InsertStationParams) er
 		arg.Name,
 		arg.Lat,
 		arg.Lon,
+		arg.BikesAvailable,
+		arg.Ebikes,
 		arg.EbikesAvailable,
 		arg.BikeDocksAvailable,
-		arg.Ebikes,
+		arg.LastUpdatedMs,
+		arg.IsOffline,
 	)
 	return err
 }
@@ -144,10 +165,12 @@ insert into stations_timeseries (id,
                                  lat,
                                  lon,
                                  bikes_available,
+                                 ebikes,
                                  ebikes_available,
                                  bike_docks_available,
                                  last_updated_ms,
-                                 is_offline)
+                                 is_offline,
+                                 created_at)
 values ($1,
         $2,
         $3,
@@ -156,7 +179,7 @@ values ($1,
         $6,
         $7,
         $8,
-        $9) ON CONFLICT (id, last_updated_ms) DO NOTHING
+        $9, $10, now() at time zone 'utc') ON CONFLICT (id, last_updated_ms) DO NOTHING
 `
 
 type InsertStationTimeseriesParams struct {
@@ -165,6 +188,7 @@ type InsertStationTimeseriesParams struct {
 	Lat                float64
 	Lon                float64
 	BikesAvailable     int32
+	Ebikes             json.RawMessage
 	EbikesAvailable    int32
 	BikeDocksAvailable int32
 	LastUpdatedMs      int64
@@ -179,6 +203,7 @@ func (q *Queries) InsertStationTimeseries(ctx context.Context, arg InsertStation
 		arg.Lat,
 		arg.Lon,
 		arg.BikesAvailable,
+		arg.Ebikes,
 		arg.EbikesAvailable,
 		arg.BikeDocksAvailable,
 		arg.LastUpdatedMs,

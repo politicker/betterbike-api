@@ -6,9 +6,12 @@ create table
         name text not null,
         lat float not null,
         lon float not null,
+        bikes_available int not null default 0,
         ebikes_available int not null default 0,
-        bike_docks_available int not null default 0,
         ebikes jsonb not null default '{}',
+        bike_docks_available int not null default 0,
+        last_updated_ms bigint not null,
+        is_offline boolean not null default false,
         created_at timestamp not null default now ()
     );
 
@@ -20,6 +23,7 @@ create table
         lon float not null,
         bikes_available int not null default 0,
         ebikes_available int not null default 0,
+        ebikes jsonb not null default '{}',
         bike_docks_available int not null default 0,
         last_updated_ms bigint not null,
         is_offline boolean not null default false,

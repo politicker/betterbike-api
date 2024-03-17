@@ -83,9 +83,12 @@ func (p *Poller) insertStationData(response *citibike.APIResponse) error {
 			Name:               station.StationName,
 			Lat:                station.Location.Lat,
 			Lon:                station.Location.Lng,
+			BikesAvailable:     int32(station.BikesAvailable),
 			EbikesAvailable:    int32(station.EbikesAvailable),
-			BikeDocksAvailable: int32(station.BikeDocksAvailable),
 			Ebikes:             ebikesJson,
+			BikeDocksAvailable: int32(station.BikeDocksAvailable),
+			LastUpdatedMs:      station.LastUpdatedMs,
+			IsOffline:          station.IsOffline,
 		})
 		if err != nil {
 			sentry.CaptureException(err)
@@ -100,6 +103,7 @@ func (p *Poller) insertStationData(response *citibike.APIResponse) error {
 			Lon:                station.Location.Lng,
 			BikesAvailable:     int32(station.BikesAvailable),
 			EbikesAvailable:    int32(station.EbikesAvailable),
+			Ebikes:             ebikesJson,
 			BikeDocksAvailable: int32(station.BikeDocksAvailable),
 			LastUpdatedMs:      station.LastUpdatedMs,
 			IsOffline:          station.IsOffline,

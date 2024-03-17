@@ -14,9 +14,12 @@ type Station struct {
 	Name               string
 	Lat                float64
 	Lon                float64
+	BikesAvailable     int32
 	EbikesAvailable    int32
-	BikeDocksAvailable int32
 	Ebikes             json.RawMessage
+	BikeDocksAvailable int32
+	LastUpdatedMs      int64
+	IsOffline          bool
 	CreatedAt          time.Time
 }
 
@@ -27,6 +30,7 @@ type StationsTimeseries struct {
 	Lon                float64
 	BikesAvailable     int32
 	EbikesAvailable    int32
+	Ebikes             json.RawMessage
 	BikeDocksAvailable int32
 	LastUpdatedMs      int64
 	IsOffline          bool

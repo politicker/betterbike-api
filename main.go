@@ -4,8 +4,10 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"go.uber.org/zap"
 	"os"
+	"time"
+
+	"go.uber.org/zap"
 
 	"github.com/getsentry/sentry-go"
 	_ "github.com/lib/pq"
@@ -71,8 +73,8 @@ func main() {
 
 	// TODO: Pass cancellable context to poller and server
 	logger.Info("starting poller")
-	//poller := NewPoller(queries, logger.With(zap.String("context", "poller")), 1*time.Minute)
-	//go poller.Start()
+	poller := NewPoller(queries, logger.With(zap.String("context", "poller")), 1*time.Minute)
+	go poller.Start()
 
 	logger.Info("starting html server", zap.String("port", port))
 	srv := web.NewServer(context.Background(), logger.With(zap.String("context", "html-server")), queries, port)

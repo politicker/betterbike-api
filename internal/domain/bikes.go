@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
+	"time"
 
 	"github.com/getsentry/sentry-go"
 	"github.com/politicker/betterbike-api/internal/api"
@@ -41,7 +42,7 @@ func (b *BikesRepo) GetNearbyStationEbikes(ctx context.Context, params db.GetSta
 	}
 
 	for _, station := range stations {
-		var bikes []api.Bike
+		var bikes []api.Ebike
 		var ebikes []citibike.Ebike
 
 		err := json.Unmarshal(station.Ebikes, &ebikes)
@@ -63,7 +64,7 @@ func (b *BikesRepo) GetNearbyStationEbikes(ctx context.Context, params db.GetSta
 				color = "var(--success-color)"
 			}
 
-			bikes = append(bikes, api.Bike{
+			bikes = append(bikes, api.Ebike{
 				ID:                fmt.Sprintf("%s-%d", station.ID, idx),
 				BatteryIcon:       fmt.Sprintf("battery.%d", quarter),
 				BatteryColor:      template.CSS(color),
@@ -74,15 +75,18 @@ func (b *BikesRepo) GetNearbyStationEbikes(ctx context.Context, params db.GetSta
 		}
 
 		viewStations = append(viewStations, api.Station{
-			ID:             station.ID,
-			Name:           station.Name,
-			BikeCount:      fmt.Sprint(station.EbikesAvailable),
-			Bikes:          bikes,
-			Lat:            station.Lat,
-			Lon:            station.Lon,
-			Distance:       station.Distance,
-			PrettyDistance: fmt.Sprintf("%d feet", int(station.Distance*MetersToFeet)),
-			CreatedAt:      station.CreatedAt,
+			ID:                 station.ID,
+			Name:               station.Name,
+			EbikesAvailable:    fmt.Sprint(station.EbikesAvailable),
+			BikesAvailable:     station.BikesAvailable,
+			BikeDocksAvailable: station.BikeDocksAvailable,
+			Ebikes:             bikes,
+			Lat:                station.Lat,
+			Lon:                station.Lon,
+			Distance:           station.Distance,
+			PrettyDistance:     fmt.Sprintf("%d feet", int(station.Distance*MetersToFeet)),
+			CreatedAt:          station.CreatedAt,
+			LastUpdated:        time.Unix(station.LastUpdatedMs, 0),
 		})
 	}
 

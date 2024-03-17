@@ -9,12 +9,12 @@
 				>
 					<h2>{{.Name}}</h2>
 				</a>
-				<p>{{.BikeCount}} bikes</p>
+				<p>{{.EbikesAvailable}} bikes</p>
 			</div>
 			<p>{{.PrettyDistance}}</p>
 		</div>
 		<div class="bikes-list">
-			{{ range .Bikes }}
+			{{ range .Ebikes }}
 			<p style="white-space: nowrap">{{.Range}}</p>
 			<!-- <p>{{.IsNextGen}}</p> -->
 			<div class="progress-bar">
