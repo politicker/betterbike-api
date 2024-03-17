@@ -17,7 +17,7 @@ run:
 	go run .
 
 copy-plist:
-	cp -f com.betterbike.plist ~/Library/LaunchAgents/
+	cp -f daemon/com.betterbike.plist ~/Library/LaunchAgents/
 
 load:
 	launchctl load ~/Library/LaunchAgents/com.betterbike.plist

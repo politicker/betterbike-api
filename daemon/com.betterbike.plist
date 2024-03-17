@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>Label</key>
+    <string>com.politicker.betterbike</string>
+
+    <key>ProgramArguments</key>
+    <array>
+      <string>/Users/harrison/projects/betterbike-api/betterbike-api</string>
+    </array>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>KeepAlive</key>
+    <true/>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/harrison/projects/betterbike-api</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+      <key>DATABASE_URL</key>
+      <string>postgresql://localhost:5432/betterbike?sslmode=disable</string>
+
+      <key>PORT</key>
+      <string>8002</string>
+
+      <key>SITE_TITLE</key>
+      <string>Betterbike</string>
+    </dict>
+
+    <key>StandardOutPath</key>
+    <string>/Users/harrison/Library/Logs/betterbike/out.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/harrison/Library/Logs/betterbike/error.log</string>
+  </dict>
+</plist>
