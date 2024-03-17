@@ -27,7 +27,7 @@ unload:
 
 deploy:
 	rm betterbike-api && \
-	go build betterbike-api && \
+	go build -o betterbike-api && \
 	just unload && \
 	just copy-plist && \
 	just load
