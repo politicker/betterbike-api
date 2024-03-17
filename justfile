@@ -19,13 +19,28 @@ run:
 copy-plist:
 	cp -f daemon/com.betterbike.plist ~/Library/LaunchAgents/
 
-load:
+load-mac:
 	launchctl load ~/Library/LaunchAgents/com.betterbike.plist
 
-unload:
+unload-mac:
 	launchctl unload ~/Library/LaunchAgents/com.betterbike.plist
 
-deploy:
+load:
+	sudo cp daemon/betterbike.service $HOME/.config/systemd/user/betterbike.service
+	systemctl --user daemon-reload
+	systemctl --user enable betterbike.service
+	systemctl --user start betterbike.service
+
+sysstatus:
+	systemctl --user status betterbike.service
+
+syslogs:
+	journalctl --user-unit=betterbike.service --no-pager
+
+syslogstail:
+	journalctl --user-unit=betterbike.service
+
+deploy-mac:
 	rm betterbike-api && \
 	go build -o betterbike-api && \
 	just unload && \
@@ -34,4 +49,7 @@ deploy:
 
 dump:
 	./bin/dump-database
+
+psql:
+	psql -h localhost -p 5433 -U $USER -d betterbike-api
 
