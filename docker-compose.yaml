@@ -1,0 +1,13 @@
+version: '3'
+services:
+  postgis:
+    image: postgis/postgis
+    environment:
+      POSTGRES_USER: harrison
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: betterbike-api
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./internal/db/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    restart: unless-stopped
