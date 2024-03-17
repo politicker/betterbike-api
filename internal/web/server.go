@@ -110,9 +110,9 @@ func (s *Server) indexHandler(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-	tmpl, err := template.ParseFS(templates,
-		"templates/index.html",
-		"templates/layout.html",
+	tmpl, err := template.ParseFiles(
+		"internal/web/templates/index.html",
+		"internal/web/templates/layout.html",
 	)
 
 	if err != nil {

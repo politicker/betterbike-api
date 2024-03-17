@@ -35,6 +35,10 @@ body {
 body {
 	background-color: var(--primary-color);
 	color: var(--dark-color);
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	align-items: stretch;
 }
 
 nav {
@@ -47,7 +51,15 @@ nav a {
 	width: 50px;
 }
 
-main {
+.index-page {
+	text-align: center;
+}
+
+.explainer {
+	font-size: x-large;
+	padding: 1em;
+}
+.station-cards {
 	display: flex;
 	flex-direction: column;
 	gap: 16px;
@@ -107,6 +119,11 @@ button {
 
 .card-header .stacked {
 	overflow: hidden;
+}
+
+.card-footer {
+	text-align: right;
+	font-style: italic;
 }
 
 .stacked {
@@ -175,7 +192,7 @@ footer a {
 	text-align: center;
 	margin: 16px;
 	color: white;
-	line-height: 25px;
+	line-height: 21px;
 	font-family: cursive;
 	text-decoration: none;
 }

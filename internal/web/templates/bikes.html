@@ -1,38 +1,40 @@
 {{define "body"}}
 <main>
-	{{range .Stations}}
-	<div class="card">
-		<div class="card-header">
-			<div class="stacked">
-				<a
-					href="https://www.google.com/maps/dir/?api=1&destination={{.Lat}},{{.Lon}}&travelmode=walking"
-				>
-					<h2>{{.Name}}</h2>
-				</a>
-				<p>{{.EbikesAvailable}} bikes</p>
+	<div class="station-cards">
+		{{range .Stations}}
+		<div class="card">
+			<div class="card-header">
+				<div class="stacked">
+					<a
+						href="https://www.google.com/maps/dir/?api=1&destination={{.Lat}},{{.Lon}}&travelmode=walking"
+					>
+						<h2>{{.Name}}</h2>
+					</a>
+					<p>{{.EbikesAvailable}} bikes</p>
+				</div>
+				<p>{{.PrettyDistance}}</p>
 			</div>
-			<p>{{.PrettyDistance}}</p>
-		</div>
 
-		<div class="bikes-list">
-			{{ range .Ebikes }}
-			<p style="white-space: nowrap">{{.Range}}</p>
-			<!-- <p>{{.IsNextGen}}</p> -->
-			<div class="progress-bar">
-				<div
-					class="progress-fill"
-					style="width: {{.BatteryPercentage}}; background-color: {{.BatteryColor}};"
-				></div>
+			<div class="bikes-list">
+				{{ range .Ebikes }}
+				<p style="white-space: nowrap">{{.Range}}</p>
+				<!-- <p>{{.IsNextGen}}</p> -->
+				<div class="progress-bar">
+					<div
+						class="progress-fill"
+						style="width: {{.BatteryPercentage}}; background-color: {{.BatteryColor}};"
+					></div>
+				</div>
+				{{end}}
 			</div>
-			{{end}}
-		</div>
 
-		<div class="card-footer">
-			<p>{{.PrettyLastUpdated}}</p>
+			<div class="card-footer">
+				<p>{{.PrettyLastUpdated}}</p>
+			</div>
 		</div>
+		{{else}}
+		<p>No stations found</p>
+		{{end}}
 	</div>
-	{{else}}
-	<p>No stations found</p>
-	{{end}}
 </main>
 {{end}}

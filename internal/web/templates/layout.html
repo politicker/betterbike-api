@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
@@ -14,7 +14,11 @@
 	<body {{if .Lat}}hx-get="/bikes?lat={{.Lat}}&lon={{.Lon}}"{{end}} {{if .Lat}}hx-trigger="every 10s"{{end}}></body>
 		<nav>
 			<a href="/">
-				<img src="/static/images/logo.svg" alt="" />
+				<img
+					src="/static/images/logo.svg"
+					alt="A bicycle icon"
+					title="BetterBike"
+				/>
 			</a>
 		</nav>
 		{{template "body" .}}
