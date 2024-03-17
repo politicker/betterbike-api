@@ -86,7 +86,8 @@ func (b *BikesRepo) GetNearbyStationEbikes(ctx context.Context, params db.GetSta
 			Distance:           station.Distance,
 			PrettyDistance:     fmt.Sprintf("%d feet", int(station.Distance*MetersToFeet)),
 			CreatedAt:          station.CreatedAt,
-			LastUpdated:        time.Unix(station.LastUpdatedMs, 0),
+			LastUpdated:        time.Unix(station.LastUpdatedMs/1000, 0),
+			PrettyLastUpdated:  timeAgo(time.Unix(station.LastUpdatedMs/1000, 0)),
 		})
 	}
 

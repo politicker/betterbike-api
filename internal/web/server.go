@@ -39,11 +39,12 @@ func NewServer(ctx context.Context, logger *zap.Logger, queries *db.Queries, por
 }
 
 func (s *Server) Start() error {
-	fs := http.FileServer(http.FS(staticFiles))
+	fs := http.FileServer(http.Dir("internal/web/static/"))
+
 	http.HandleFunc("GET /api", s.GetBikes)
 	http.HandleFunc("GET /", s.indexHandler)
 	http.HandleFunc("GET /bikes", s.bikesHandler)
-	http.Handle("GET /static/", fs)
+	http.Handle("GET /static/", http.StripPrefix("/static", fs))
 
 	s.logger.Info("listening", zap.String("port", s.port))
 	return http.ListenAndServe(":"+s.port, nil)
@@ -105,6 +106,10 @@ func (s *Server) GetBikes(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) indexHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/" {
+		http.NotFound(w, r)
+		return
+	}
 	tmpl, err := template.ParseFS(templates,
 		"templates/index.html",
 		"templates/layout.html",
@@ -123,7 +128,7 @@ func (s *Server) indexHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) bikesHandler(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFS(templates, "templates/bikes.html", "templates/layout.html")
+	tmpl, err := template.ParseFiles("internal/web/templates/bikes.html", "internal/web/templates/layout.html")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

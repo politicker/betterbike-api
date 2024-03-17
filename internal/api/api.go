@@ -26,6 +26,7 @@ type Station struct {
 	Distance           float64   `json:"distance"`
 	PrettyDistance     string    `json:"prettyDistance"`
 	LastUpdated        time.Time `json:"lastUpdated"`
+	PrettyLastUpdated  string    `json:"prettyLastUpdated"`
 	CreatedAt          time.Time `json:"createdAt"`
 }
 
