@@ -26,10 +26,13 @@ unload-mac:
 	launchctl unload ~/Library/LaunchAgents/com.betterbike.plist
 
 load:
-	sudo cp daemon/betterbike.service $HOME/.config/systemd/user/betterbike.service
-	systemctl --user daemon-reload
-	systemctl --user enable betterbike.service
-	systemctl --user start betterbike.service
+    systemctl --user stop betterbike.service || true
+    systemctl --user disable betterbike.service || true
+    sudo rm -f $HOME/.config/systemd/user/betterbike.service
+    sudo cp daemon/betterbike.service $HOME/.config/systemd/user/betterbike.service
+    systemctl --user daemon-reload
+    systemctl --user enable betterbike.service
+    systemctl --user start betterbike.service
 
 sysstatus:
 	systemctl --user status betterbike.service
@@ -41,8 +44,8 @@ syslogstail:
 	journalctl --user-unit=betterbike.service
 
 deploy-mac:
-	rm betterbike-api && \
-	go build -o betterbike-api && \
+	rm betterbike && \
+	go build -o betterbike && \
 	just unload && \
 	just copy-plist && \
 	just load
