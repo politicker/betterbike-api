@@ -39,12 +39,11 @@ func NewServer(ctx context.Context, logger *zap.Logger, queries *db.Queries, por
 }
 
 func (s *Server) Start() error {
-	fs := http.FileServer(http.Dir("internal/web/static/"))
+	http.Handle("GET /static/", http.FileServer(http.FS(staticFiles)))
 
 	http.HandleFunc("GET /api", s.GetBikes)
 	http.HandleFunc("GET /", s.indexHandler)
 	http.HandleFunc("GET /bikes", s.bikesHandler)
-	http.Handle("GET /static/", http.StripPrefix("/static", fs))
 
 	s.logger.Info("listening", zap.String("port", s.port))
 	return http.ListenAndServe(":"+s.port, nil)
@@ -111,8 +110,8 @@ func (s *Server) indexHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	tmpl, err := template.ParseFiles(
-		"internal/web/templates/index.html",
-		"internal/web/templates/layout.html",
+		"index.html",
+		"layout.html",
 	)
 
 	if err != nil {
@@ -128,7 +127,7 @@ func (s *Server) indexHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) bikesHandler(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles("internal/web/templates/bikes.html", "internal/web/templates/layout.html")
+	tmpl, err := template.ParseFiles("bikes.html", "layout.html")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
